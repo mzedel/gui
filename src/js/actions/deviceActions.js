@@ -408,31 +408,6 @@ export const getDeviceById = id => dispatch =>
       return err;
     });
 
-const deriveInactiveDevices = deviceIds => (dispatch, getState) => {
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  const yesterdaysIsoString = yesterday.toISOString();
-  const state = getState().devices;
-  // now boil the list down to the ones that were not updated since yesterday
-  const devices = deviceIds.reduce(
-    (accu, id) => {
-      const device = state.byId[id];
-      if (device && device.updated_ts > yesterdaysIsoString) {
-        accu.active.push(id);
-      } else {
-        accu.inactive.push(id);
-      }
-      return accu;
-    },
-    { active: [], inactive: [] }
-  );
-  return dispatch({
-    type: DeviceConstants.SET_INACTIVE_DEVICES,
-    inactiveDeviceIds: devices.inactive,
-    activeDeviceIds: devices.active
-  });
-};
-
 /*
     Device Auth + admission
   */
@@ -517,6 +492,34 @@ export const getDevicesByStatus = (status, page = defaultPage, perPage = default
     });
 };
 
+export const getActiveDevices = currentTime => dispatch =>
+  Promise.all([
+    GeneralApi.post(`${inventoryApiUrlV2}/filters/search`, {
+      page: 1,
+      per_page: 1,
+      filters: mapFiltersToTerms([
+        { key: 'status', value: DeviceConstants.DEVICE_STATES.accepted, operator: '$eq', scope: 'identity' },
+        { key: 'updated_ts', value: currentTime, operator: '$gte', scope: 'system' }
+      ])
+    }),
+    GeneralApi.post(`${inventoryApiUrlV2}/filters/search`, {
+      page: 1,
+      per_page: 1,
+      filters: mapFiltersToTerms([
+        { key: 'status', value: DeviceConstants.DEVICE_STATES.accepted, operator: '$eq', scope: 'identity' },
+        { key: 'updated_ts', value: currentTime, operator: '$lt', scope: 'system' }
+      ])
+    })
+  ]).then(results => {
+    const activeDeviceTotal = Number(results[0].headers[headerNames.total]);
+    const inactiveDeviceTotal = Number(results[1].headers[headerNames.total]);
+    return dispatch({
+      type: DeviceConstants.SET_INACTIVE_DEVICES,
+      inactiveDeviceTotal,
+      activeDeviceTotal
+    });
+  });
+
 export const getAllDevicesByStatus = status => (dispatch, getState) => {
   const getAllDevices = (perPage = 500, page = 1, devices = []) =>
     GeneralApi.post(`${inventoryApiUrlV2}/filters/search`, {
@@ -541,9 +544,6 @@ export const getAllDevicesByStatus = status => (dispatch, getState) => {
           total: deviceAccu.ids.length
         })
       ];
-      if (status === DeviceConstants.DEVICE_STATES.accepted && deviceAccu.ids.length === total) {
-        tasks.push(dispatch(deriveInactiveDevices(deviceAccu.ids)));
-      }
       return Promise.all(tasks);
     });
   return getAllDevices();

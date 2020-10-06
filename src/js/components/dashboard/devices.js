@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { getAllDevicesByStatus, getDeviceCount } from '../../actions/deviceActions';
+import { getActiveDevices, getDeviceCount } from '../../actions/deviceActions';
 import { setShowConnectingDialog } from '../../actions/userActions';
 import { DEVICE_STATES } from '../../constants/deviceConstants';
 import AcceptedDevices from './widgets/accepteddevices';
@@ -37,7 +37,10 @@ export class Devices extends React.Component {
     if (this.state.loading || this.props.acceptedDevicesCount > this.props.deploymentDeviceLimit) {
       return;
     }
-    this.props.getAllDevicesByStatus(DEVICE_STATES.accepted);
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdaysIsoString = yesterday.toISOString();
+    this.props.getActiveDevices(yesterdaysIsoString);
     this.props.getDeviceCount(DEVICE_STATES.pending);
     const deltaActivity = this._updateDeviceActivityHistory(this.props.activeDevicesCount);
     this.setState({ deltaActivity });
@@ -125,7 +128,7 @@ export class Devices extends React.Component {
   }
 }
 
-const actionCreators = { getAllDevicesByStatus, getDeviceCount, setShowConnectingDialog };
+const actionCreators = { getActiveDevices, getDeviceCount, setShowConnectingDialog };
 
 const mapStateToProps = state => {
   return {
