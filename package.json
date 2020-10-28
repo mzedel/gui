@@ -23,7 +23,7 @@
     "moment-duration-format": "^2.3.2",
     "pluralize": "^8.0.0",
     "react": "~16.13.1",
-    "react-big-calendar": "^0.28.0",
+    "react-big-calendar": "^0.28.1",
     "react-copy-to-clipboard": "^5.0.2",
     "react-dom": "~16.13.1",
     "react-dropzone": "^11.2.1",
