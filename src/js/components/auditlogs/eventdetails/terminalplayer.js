@@ -5,6 +5,7 @@ import { Button } from '@material-ui/core';
 import { XTerm } from 'xterm-for-react';
 import { FitAddon } from 'xterm-addon-fit';
 import { SearchAddon } from 'xterm-addon-search';
+import { TextDecoder } from 'text-encoding';
 import msgpack5 from 'msgpack5';
 import { deviceConnect } from '../../../actions/deviceActions';
 import { MessageProtocol, MessageTypes, blobToString, byteArrayToString } from '../../devices/terminal';
@@ -102,7 +103,7 @@ const generateHtml = (versions, content) => {
           }
           const item = content[contentIndex];
           contentIndex += 1;
-          let delay = 1;
+          let delay = 1000;
           if (item.content) {
             const buffer = JSON.parse(atob(item.content));
             term.write(byteArrayToString(buffer.data || []))
@@ -148,6 +149,7 @@ export const TerminalPlayer = ({ className, item, sessionInitialized }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [wasStarted, setWasStarted] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  var global_s = '';
 
   useEffect(() => {
     if (!sessionInitialized) {
@@ -169,7 +171,7 @@ export const TerminalPlayer = ({ className, item, sessionInitialized }) => {
     socket.onmessage = event =>
       blobToString(event.data).then(data => {
         const {
-          hdr: { proto, typ },
+          hdr: { proto, typ, props },
           body
         } = MessagePack.decode(data);
         if (proto !== MessageProtocol.Shell) {
@@ -177,9 +179,17 @@ export const TerminalPlayer = ({ className, item, sessionInitialized }) => {
         }
         switch (typ) {
           case MessageTypes.Shell:
+            var s = new TextDecoder('utf-8').decode(body);
+            console.log('got shell, buffer length: ' + buffer.length + ': {');
+            global_s += s;
+            console.log(global_s);
+            console.log('}');
             return buffer.push({ content: body });
           case MessageTypes.Delay:
-            return buffer.push({ delay: body });
+            console.log('got delay {');
+            console.log(props);
+            console.log('}');
+            return buffer.push({ delay: props.delay_value, content: null });
           default:
             break;
         }

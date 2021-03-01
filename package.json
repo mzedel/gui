@@ -51,6 +51,7 @@
     "xterm": "^4.10.0",
     "xterm-addon-fit": "^0.5.0",
     "xterm-addon-search": "^0.8.0",
+    "text-encoding": "0.7.0",
     "xterm-for-react": "^1.0.4",
     "zxcvbn": "^4.4.2"
   },
@@ -159,7 +160,7 @@
     ]
   },
   "scripts": {
-    "build": "webpack --mode production --entry ./src/js/main.js",
+    "build": "webpack --mode development --entry ./src/js/main.js",
     "disclaim": "yarn licenses generate-disclaimer > disclaimer.txt",
     "lint": "eslint src",
     "lint-fix": "eslint --fix src",

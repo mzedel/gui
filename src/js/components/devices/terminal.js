@@ -24,7 +24,8 @@ export const MessageTypes = {
   Pong: 'pong',
   Resize: 'resize',
   Shell: 'shell',
-  Stop: 'stop'
+  Stop: 'stop',
+  Delay: 'delay'
 };
 
 const MessagePack = msgpack5();
