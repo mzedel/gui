@@ -24,6 +24,7 @@ import Announcement from './announcement';
 import DemoNotification from './demonotification';
 import DeviceNotifications from './devicenotifications';
 import DeploymentNotifications from './deploymentnotifications';
+import FeatureNotification from './featurenotification';
 import TrialNotification from './trialnotification';
 import OfferHeader from './offerheader';
 
@@ -153,6 +154,7 @@ export class Header extends React.Component {
           {!!announcement && <Announcement announcement={announcement} onHide={setHideAnnouncement} />}
           {organization?.trial && <TrialNotification expiration={organization.trial_expiration} />}
           <div style={{ flexGrow: '1' }}></div>
+          <FeatureNotification />
           <DeviceNotifications pending={pendingDevices} total={acceptedDevices} limit={deviceLimit} />
           <DeploymentNotifications inprogress={inProgress} />
           <Button
