@@ -138,6 +138,7 @@ export const DeploymentReport = props => {
   };
 
   const { devices = {}, type: deploymentType } = deployment;
+  const { log: logData } = devices[deviceId] || {};
   const finished = deployment.finished || deployment.status === DEPLOYMENT_STATES.finished;
   const isConfigurationDeployment = deploymentType === DEPLOYMENT_TYPES.configuration;
   let config = {};
@@ -209,7 +210,7 @@ export const DeploymentReport = props => {
         <DeploymentStatus deployment={deployment} />
         <DeviceList {...props} refreshTrigger={deviceListRefreshTrigger} viewLog={viewLog} />
         <RolloutSchedule deployment={deployment} onUpdateControlChange={onUpdateControlChange} onAbort={abort} innerRef={rolloutSchedule} />
-        {deviceId && <LogDialog logData={logData} onClose={() => setDeviceId()} />}
+        {deviceId && <LogDialog logData={logData} onClose={() => setDeviceId('')} />}
       </div>
       <Divider light style={{ marginTop: theme.spacing(2) }} />
     </Drawer>
