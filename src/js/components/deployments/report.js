@@ -17,7 +17,7 @@ import {
 
 import { setSnackbar } from '../../actions/appActions';
 import { getDeviceAuth, getDeviceById } from '../../actions/deviceActions';
-import { getDeviceLog, getSingleDeployment, updateDeploymentControlMap } from '../../actions/deploymentActions';
+import { getDeploymentDevices, getDeviceLog, getSingleDeployment, updateDeploymentControlMap } from '../../actions/deploymentActions';
 import { getAuditLogs } from '../../actions/organizationActions';
 import { getRelease } from '../../actions/releaseActions';
 import { deploymentStatesToSubstates, DEPLOYMENT_STATES, DEPLOYMENT_TYPES } from '../../constants/deploymentConstants';
@@ -60,11 +60,9 @@ export const DeploymentAbortButton = ({ abort, deployment }) => {
 };
 
 export const DeploymentReport = props => {
-  const [deviceId, setDeviceId] = useState();
-  const rolloutSchedule = useRef();
   const {
     abort,
-    allDevices,
+    creator,
     deployment,
     getAuditLogs,
     getDeviceLog,
@@ -79,6 +77,9 @@ export const DeploymentReport = props => {
     type,
     updateDeploymentControlMap
   } = props;
+  const [deviceId, setDeviceId] = useState('');
+  const [deviceListRefreshTrigger, setDeviceListRefreshTrigger] = useState(false);
+  const rolloutSchedule = useRef();
 
   useEffect(() => {
     clearInterval(timer);
@@ -121,6 +122,7 @@ export const DeploymentReport = props => {
     if (!deployment.id) {
       return;
     }
+    setDeviceListRefreshTrigger(!deviceListRefreshTrigger);
     return getSingleDeployment(deployment.id);
   };
 
@@ -206,7 +208,7 @@ export const DeploymentReport = props => {
           <span>Status</span>
         </h4>
         <DeploymentStatus deployment={deployment} />
-        <DeviceList {...props} created={created} viewLog={viewLog} />
+        <DeviceList {...props} refreshTrigger={deviceListRefreshTrigger} viewLog={viewLog} />
         <RolloutSchedule deployment={deployment} onUpdateControlChange={onUpdateControlChange} onAbort={abort} innerRef={rolloutSchedule} />
         {deviceId && <LogDialog logData={logData} onClose={() => setDeviceId()} />}
       </div>
@@ -215,7 +217,17 @@ export const DeploymentReport = props => {
   );
 };
 
-const actionCreators = { getAuditLogs, getDeviceAuth, getDeviceById, getDeviceLog, getRelease, getSingleDeployment, setSnackbar, updateDeploymentControlMap };
+const actionCreators = {
+  getAuditLogs,
+  getDeploymentDevices,
+  getDeviceAuth,
+  getDeviceById,
+  getDeviceLog,
+  getRelease,
+  getSingleDeployment,
+  setSnackbar,
+  updateDeploymentControlMap
+};
 
 const mapStateToProps = state => {
   const devices = state.deployments.byId[state.deployments.selectedDeployment]?.devices || {};

@@ -2,7 +2,7 @@ import DeploymentConstants from '../constants/deploymentConstants';
 
 export const initialState = {
   byId: {
-    // [id]: { stats, devices: { [deploymentId]: { id, log } } }
+    // [id]: { stats, devices: { [deploymentId]: { id, log } }, totalDeviceCount }
   },
   byStatus: {
     finished: { deploymentIds: [], selectedDeploymentIds: [], total: 0 },
@@ -11,6 +11,7 @@ export const initialState = {
     scheduled: { deploymentIds: [], selectedDeploymentIds: [], total: 0 }
   },
   deploymentDeviceLimit: 5000,
+  selectedDeviceIds: [],
   selectedDeployment: null
 };
 
@@ -68,6 +69,19 @@ const deploymentReducer = (state = initialState, action) => {
         byId: {
           ...state.byId,
           [action.deployment.id]: action.deployment
+        }
+      };
+    case DeploymentConstants.RECEIVE_DEPLOYMENT_DEVICES:
+      return {
+        ...state,
+        byId: {
+          ...state.byId,
+          selectedDeviceIds: action.selectedDeviceIds,
+          [action.deploymentId]: {
+            ...state.byId[action.deploymentId],
+            devices: action.devices,
+            totalDeviceCount: action.totalDeviceCount
+          }
         }
       };
     case DeploymentConstants.RECEIVE_INPROGRESS_DEPLOYMENTS:
