@@ -27,7 +27,7 @@ import ConfigurationObject from '../common/configurationobject';
 import LogDialog from '../common/dialogs/log';
 import DeploymentOverview from './deployment-report/overview';
 import RolloutSchedule from './deployment-report/rolloutschedule';
-import { sortDeploymentDevices, statCollector } from '../../helpers';
+import { statCollector } from '../../helpers';
 import Confirm from '../common/confirm';
 import DeviceList from './deployment-report/devicelist';
 import DeploymentStatus from './deployment-report/deploymentstatus';
@@ -137,8 +137,7 @@ export const DeploymentReport = props => {
     setSnackbar('Link copied to clipboard');
   };
 
-  const { created = new Date().toISOString(), devices, type: deploymentType } = deployment;
-  const logData = deviceId && devices[deviceId] ? devices[deviceId].log : null;
+  const { devices = {}, type: deploymentType } = deployment;
   const finished = deployment.finished || deployment.status === DEPLOYMENT_STATES.finished;
   const isConfigurationDeployment = deploymentType === DEPLOYMENT_TYPES.configuration;
   let config = {};
@@ -193,7 +192,7 @@ export const DeploymentReport = props => {
       <Divider />
       <div className="deployment-report">
         <DeploymentPhaseNotification deployment={deployment} onReviewClick={scrollToBottom} />
-        <DeploymentOverview {...props} onScheduleClick={scrollToBottom} />
+        <DeploymentOverview creator={creator} deployment={deployment} onScheduleClick={scrollToBottom} />
 
         {isConfigurationDeployment && (
           <>
@@ -230,16 +229,13 @@ const actionCreators = {
 };
 
 const mapStateToProps = state => {
-  const devices = state.deployments.byId[state.deployments.selectedDeployment]?.devices || {};
-  const allDevices = sortDeploymentDevices(Object.values(devices)).map(device => ({ ...state.devices.byId[device.id], ...device }));
+  const { devices = {} } = state.deployments.byId[state.deployments.selectedDeployment] || {};
+  const selectedDevices = state.deployments.selectedDeviceIds.map(deviceId => ({ ...state.devices.byId[deviceId], ...devices[deviceId] }));
   const deployment = state.deployments.byId[state.deployments.selectedDeployment] || {};
   const { actor = {} } = state.organization.events.find(event => event.object.id === state.deployments.selectedDeployment) || {};
   return {
     acceptedDevicesCount: state.devices.byStatus.accepted.total,
-    allDevices,
     creator: actor.email,
-    deviceCount: allDevices.length,
-    devicesById: state.devices.byId,
     deployment,
     idAttribute: getIdAttribute(state),
     isEnterprise: getIsEnterprise(state),
@@ -247,7 +243,8 @@ const mapStateToProps = state => {
     release:
       deployment.artifact_name && state.releases.byId[deployment.artifact_name]
         ? state.releases.byId[deployment.artifact_name]
-        : { device_types_compatible: [] }
+        : { device_types_compatible: [] },
+    selectedDevices
   };
 };
 
