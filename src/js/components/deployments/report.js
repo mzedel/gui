@@ -174,7 +174,7 @@ export const DeploymentReport = props => {
               title="This will create a new deployment with the same device group and Release.&#10;Devices with this Release already installed will be skipped, all others will be updated."
               placement="bottom"
             >
-              <Button color="secondary" startIcon={<RefreshIcon fontSize="small" />} onClick={() => retry(deployment, Object.values(allDevices))}>
+              <Button color="secondary" startIcon={<RefreshIcon fontSize="small" />} onClick={() => retry(deployment, Object.keys(devices))}>
                 Recreate deployment?
               </Button>
             </Tooltip>

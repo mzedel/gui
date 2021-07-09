@@ -111,13 +111,13 @@ export const Deployments = ({
     };
   }, []);
 
-  const retryDeployment = (deployment, devices) => {
+  const retryDeployment = (deployment, deploymentDeviceIds) => {
     const { artifact_name, device_types_compatible = [], name, update_control_map = {} } = deployment;
     const release = { Name: artifact_name, device_types_compatible };
     const updateControlMap = isEnterprise ? { update_control_map: { states: update_control_map.states || {} } } : {};
     const deploymentObject = {
       group: name,
-      deploymentDeviceIds: devices.map(item => item.id),
+      deploymentDeviceIds,
       phases: [{ batch_size: 100, start_ts: undefined, delay: 0 }],
       release,
       ...updateControlMap
