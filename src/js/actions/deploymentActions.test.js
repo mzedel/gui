@@ -2,7 +2,15 @@ import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import { defaultState } from '../../../tests/mockData';
 
-import { abortDeployment, createDeployment, getDeploymentsByStatus, getDeviceLog, selectDeployment, updateDeploymentControlMap } from './deploymentActions';
+import {
+  abortDeployment,
+  createDeployment,
+  getDeploymentsByStatus,
+  getDeploymentDevices,
+  getDeviceLog,
+  selectDeployment,
+  updateDeploymentControlMap
+} from './deploymentActions';
 import AppConstants from '../constants/appConstants';
 import DeploymentConstants from '../constants/deploymentConstants';
 
@@ -19,6 +27,13 @@ const defaultResponseActions = {
     type: DeploymentConstants.CREATE_DEPLOYMENT,
     deployment: { devices: [{ id: Object.keys(defaultState.devices.byId)[0], status: 'pending' }], stats: {} },
     deploymentId: createdDeployment.id
+  },
+  devices: {
+    type: DeploymentConstants.RECEIVE_DEPLOYMENT_DEVICES,
+    deploymentId: defaultState.deployments.byId.d1.id,
+    devices: defaultState.deployments.byId.d1.devices,
+    selectedDeviceIds: [defaultState.deployments.byId.d1.devices.a1.id],
+    totalDeviceCount: 1
   },
   log: {
     type: DeploymentConstants.RECEIVE_DEPLOYMENT_DEVICE_LOG,
@@ -175,6 +190,15 @@ describe('deployment actions', () => {
     const store = mockStore({ ...defaultState });
     const expectedActions = [defaultResponseActions.log];
     return store.dispatch(getDeviceLog(Object.keys(defaultState.deployments.byId)[0], defaultState.deployments.byId.d1.devices.a1.id)).then(() => {
+      const storeActions = store.getActions();
+      expect(storeActions.length).toEqual(expectedActions.length);
+      expectedActions.map((action, index) => expect(storeActions[index]).toMatchObject(action));
+    });
+  });
+  it('should allow deployment device list retrieval', async () => {
+    const store = mockStore({ ...defaultState });
+    const expectedActions = [defaultResponseActions.devices];
+    return store.dispatch(getDeploymentDevices(Object.keys(defaultState.deployments.byId)[0])).then(() => {
       const storeActions = store.getActions();
       expect(storeActions.length).toEqual(expectedActions.length);
       expectedActions.map((action, index) => expect(storeActions[index]).toMatchObject(action));

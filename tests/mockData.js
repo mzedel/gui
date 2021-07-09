@@ -92,7 +92,8 @@ export const defaultState = {
       scheduled: { deploymentIds: ['d2'], selectedDeploymentIds: ['d2'], total: 1 }
     },
     deploymentDeviceLimit: 500,
-    selectedDeployment: 'd1'
+    selectedDeployment: 'd1',
+    selectedDeviceIds: []
   },
   devices: {
     byId: {
