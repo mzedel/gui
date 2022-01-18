@@ -35,7 +35,7 @@
     "react-idle-timer": "^4.6.4",
     "react-linkify": "^1.0.0-alpha",
     "react-redux": "^7.2.6",
-    "react-router-dom": "^5.3.0",
+    "react-router-dom": "^6.2.1",
     "react-time": "^4.3.0",
     "react-virtualized-auto-sizer": "^1.0.6",
     "react-window": "^1.8.6",
