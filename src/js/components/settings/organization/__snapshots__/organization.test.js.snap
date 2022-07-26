@@ -714,7 +714,16 @@ label[data-shrink=false]+.MuiInputBase-formControl .emotion-40:focus::-ms-input-
   color: #d32f2f;
 }
 
-.emotion-51 {
+.emotion-48 {
+  color: rgba(0, 0, 0, 0.38);
+  margin: 15px 0;
+}
+
+.emotion-49 {
+  gap: 8px;
+}
+
+.emotion-53 {
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
@@ -763,23 +772,23 @@ label[data-shrink=false]+.MuiInputBase-formControl .emotion-40:focus::-ms-input-
   box-shadow: 0px 3px 1px -2px rgba(0,0,0,0.2),0px 2px 2px 0px rgba(0,0,0,0.14),0px 1px 5px 0px rgba(0,0,0,0.12);
 }
 
-.emotion-51::-moz-focus-inner {
+.emotion-53::-moz-focus-inner {
   border-style: none;
 }
 
-.emotion-51.Mui-disabled {
+.emotion-53.Mui-disabled {
   pointer-events: none;
   cursor: default;
 }
 
 @media print {
-  .emotion-51 {
+  .emotion-53 {
     -webkit-print-color-adjust: exact;
     color-adjust: exact;
   }
 }
 
-.emotion-51:hover {
+.emotion-53:hover {
   -webkit-text-decoration: none;
   text-decoration: none;
   background-color: #1565c0;
@@ -787,32 +796,32 @@ label[data-shrink=false]+.MuiInputBase-formControl .emotion-40:focus::-ms-input-
 }
 
 @media (hover: none) {
-  .emotion-51:hover {
+  .emotion-53:hover {
     background-color: #1976d2;
   }
 }
 
-.emotion-51:active {
+.emotion-53:active {
   box-shadow: 0px 5px 5px -3px rgba(0,0,0,0.2),0px 8px 10px 1px rgba(0,0,0,0.14),0px 3px 14px 2px rgba(0,0,0,0.12);
 }
 
-.emotion-51.Mui-focusVisible {
+.emotion-53.Mui-focusVisible {
   box-shadow: 0px 3px 5px -1px rgba(0,0,0,0.2),0px 6px 10px 0px rgba(0,0,0,0.14),0px 1px 18px 0px rgba(0,0,0,0.12);
 }
 
-.emotion-51.Mui-disabled {
+.emotion-53.Mui-disabled {
   color: rgba(0, 0, 0, 0.26);
   box-shadow: none;
   background-color: rgba(0, 0, 0, 0.12);
 }
 
-.emotion-52 {
+.emotion-54 {
   background-color: #bdbdbd;
   margin-top: 48px;
   padding: 16px;
 }
 
-.emotion-52>h5 {
+.emotion-54>h5 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -1076,14 +1085,13 @@ label[data-shrink=false]+.MuiInputBase-formControl .emotion-40:focus::-ms-input-
               id="mui-2-helper-text"
             >
               <p
-                class="info icon "
+                class="emotion-48 icon flexbox center-aligned emotion-49 "
               >
                 <svg
                   aria-hidden="true"
                   class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall emotion-44"
                   data-testid="InfoOutlinedIcon"
                   focusable="false"
-                  style="vertical-align: middle; margin: 0px 6px 4px 0px;"
                   viewBox="0 0 24 24"
                 >
                   <path
@@ -1108,7 +1116,7 @@ label[data-shrink=false]+.MuiInputBase-formControl .emotion-40:focus::-ms-input-
               />
             </button>
             <button
-              class="MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButtonBase-root Mui-disabled  emotion-51"
+              class="MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButtonBase-root Mui-disabled  emotion-53"
               disabled=""
               tabindex="-1"
               type="button"
@@ -1121,7 +1129,7 @@ label[data-shrink=false]+.MuiInputBase-formControl .emotion-40:focus::-ms-input-
     </div>
   </div>
   <div
-    class="emotion-52"
+    class="emotion-54"
   >
     <h5>
       Billing

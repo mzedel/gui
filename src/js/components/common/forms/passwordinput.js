@@ -5,8 +5,6 @@ import generator from 'generate-password';
 import { Button, FormControl, FormHelperText, IconButton, Input, InputAdornment, InputLabel } from '@mui/material';
 import { CheckCircle as CheckIcon, Visibility as VisibilityIcon, VisibilityOff as VisibilityOffIcon } from '@mui/icons-material';
 
-import { colors } from '../../../themes/Mender';
-
 export default class PasswordInput extends React.Component {
   constructor(props, context) {
     super(props, context);
@@ -119,9 +117,7 @@ export default class PasswordInput extends React.Component {
           <div>
             <div className="help-text" id="pass-strength">
               Strength: <meter max={4} min={0} value={this.state.score} high={3.9} optimum={4} low={2.5} />
-              {this.state.score > 3 ? (
-                <CheckIcon className="fadeIn" style={{ color: colors.successStyleColor, height: '18px', marginTop: '-3px', marginBottom: '-3px' }} />
-              ) : null}
+              {this.state.score > 3 ? <CheckIcon className="fadeIn green" style={{ height: '18px', marginTop: '-3px', marginBottom: '-3px' }} /> : null}
             </div>
             {feedback}
             {generate ? (
