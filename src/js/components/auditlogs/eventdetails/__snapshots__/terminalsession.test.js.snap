@@ -124,17 +124,22 @@ exports[`TerminalSession Component renders correctly 1`] = `
   border-radius: inherit;
 }
 
-.emotion-13 {
+.emotion-13 .key>b {
+  background-color: #bdbdbd;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.emotion-14 {
   grid-template-columns: minmax(max-content, 150px) max-content;
   row-gap: 20px;
 }
 
-.emotion-14 {
+.emotion-15 {
   color: rgba(0, 0, 0, 0.6);
   font-weight: initial;
 }
 
-.emotion-15 {
+.emotion-16 {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -334,18 +339,20 @@ exports[`TerminalSession Component renders correctly 1`] = `
          details
       </b>
       <div
-        class="muted two-columns emotion-13"
+        class="break-all two-columns emotion-13  emotion-14"
       >
         <div
-          class="align-right"
+          class="align-right key muted"
         >
           <b>
             Device ID
           </b>
         </div>
-        <div>
+        <div
+          class="flexbox "
+        >
           <a
-            class="flexbox center-aligned emotion-14"
+            class="flexbox center-aligned emotion-15"
             href="/devices?id=a1"
           >
             <div>
@@ -353,7 +360,7 @@ exports[`TerminalSession Component renders correctly 1`] = `
             </div>
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall margin-left-small link-color emotion-15"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall margin-left-small link-color emotion-16"
               data-testid="LaunchIcon"
               focusable="false"
               viewBox="0 0 24 24"
@@ -365,33 +372,39 @@ exports[`TerminalSession Component renders correctly 1`] = `
           </a>
         </div>
         <div
-          class="align-right"
+          class="align-right key muted"
         >
           <b>
             Device type
           </b>
         </div>
-        <div>
+        <div
+          class="flexbox "
+        >
           raspberrypi4
         </div>
         <div
-          class="align-right"
+          class="align-right key muted"
         >
           <b>
             System software version
           </b>
         </div>
-        <div>
+        <div
+          class="flexbox "
+        >
           -
         </div>
         <div
-          class="align-right"
+          class="align-right key muted"
         >
           <b>
              
           </b>
         </div>
-        <div>
+        <div
+          class="flexbox "
+        >
           <a
             href="/auditlog?object_type=device&object_id=a1&start_date=2016-01-01T00:00:00.000Z"
           >
@@ -410,26 +423,30 @@ exports[`TerminalSession Component renders correctly 1`] = `
          details
       </b>
       <div
-        class="muted two-columns emotion-13"
+        class="break-all two-columns emotion-13  emotion-14"
       >
         <div
-          class="align-right"
+          class="align-right key muted"
         >
           <b>
             Session ID
           </b>
         </div>
-        <div>
+        <div
+          class="flexbox "
+        >
           abd313a8-ee88-48ab-9c99-fbcd80048e6e
         </div>
         <div
-          class="align-right"
+          class="align-right key muted"
         >
           <b>
             Start time
           </b>
         </div>
-        <div>
+        <div
+          class="flexbox "
+        >
           <time
             datetime="2019-01-01T12:10:22+00:00"
           >
@@ -437,13 +454,15 @@ exports[`TerminalSession Component renders correctly 1`] = `
           </time>
         </div>
         <div
-          class="align-right"
+          class="align-right key muted"
         >
           <b>
             End time
           </b>
         </div>
-        <div>
+        <div
+          class="flexbox "
+        >
           <time
             datetime="2019-01-01T12:16:22+00:00"
           >
@@ -451,23 +470,27 @@ exports[`TerminalSession Component renders correctly 1`] = `
           </time>
         </div>
         <div
-          class="align-right"
+          class="align-right key muted"
         >
           <b>
             Duration
           </b>
         </div>
-        <div>
+        <div
+          class="flexbox "
+        >
           00:05:59:998
         </div>
         <div
-          class="align-right"
+          class="align-right key muted"
         >
           <b>
             User
           </b>
         </div>
-        <div>
+        <div
+          class="flexbox "
+        >
           string@example.com
         </div>
       </div>

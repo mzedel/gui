@@ -1,8 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`UserChange Component renders correctly 1`] = `
+.emotion-0 {
+  border: 1px solid;
+}
+
 <div
-  class="code flexbox column"
+  class="code emotion-0 flexbox column"
 >
   <span
     class=""

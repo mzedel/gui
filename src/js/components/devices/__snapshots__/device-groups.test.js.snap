@@ -300,11 +300,10 @@ exports[`DeviceGroups Component renders correctly 1`] = `
           </div>
         </div>
         <div
-          class=\\"flexbox space-between filter-header\\"
+          class=\\"flexbox space-between\\"
         >
           <div
-            class=\\"flexbox centered \\"
-            style=\\"margin-bottom: -1px;\\"
+            class=\\"flexbox centered filter-header \\"
           >
             <button
               class=\\"MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1d3f8j8-MuiButtonBase-root-MuiButton-root\\"
@@ -386,7 +385,7 @@ exports[`DeviceGroups Component renders correctly 1`] = `
           style=\\"grid-template-columns: 52px minmax(250px, 1fr) minmax(150px, 1.5fr) minmax(150px, 1.5fr) minmax(150px, 1.5fr) minmax(150px, max-content);\\"
         >
           <div
-            class=\\"header\\"
+            class=\\"header tss-1cutqug-header\\"
           >
             <div
               class=\\"deviceListRow\\"
@@ -477,7 +476,7 @@ exports[`DeviceGroups Component renders correctly 1`] = `
                   class=\\"flexbox center-aligned\\"
                 >
                   <span
-                    class=\\"resize-handle\\"
+                    class=\\"resize-handle tss-hz6pkt-resizeHandle \\"
                   />
                 </div>
               </div>
@@ -505,7 +504,7 @@ exports[`DeviceGroups Component renders correctly 1`] = `
                   class=\\"flexbox center-aligned\\"
                 >
                   <span
-                    class=\\"resize-handle\\"
+                    class=\\"resize-handle tss-hz6pkt-resizeHandle \\"
                   />
                 </div>
               </div>

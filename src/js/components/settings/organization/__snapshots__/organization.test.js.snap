@@ -816,7 +816,6 @@ label[data-shrink=false]+.MuiInputBase-formControl .emotion-40:focus::-ms-input-
 }
 
 .emotion-54 {
-  background-color: #bdbdbd;
   margin-top: 48px;
   padding: 16px;
 }

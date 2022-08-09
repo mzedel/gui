@@ -137,10 +137,6 @@ exports[`PendingDevices Component renders correctly 1`] = `
   border-radius: inherit;
 }
 
-.emotion-3 {
-  background: #bdbdbd;
-}
-
 .emotion-4 {
   height: 100%;
   width: 100%;

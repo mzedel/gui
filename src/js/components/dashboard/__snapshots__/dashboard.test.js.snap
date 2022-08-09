@@ -166,10 +166,6 @@ exports[`Dashboard Component renders correctly 1`] = `
   align-items: flex-end;
 }
 
-.emotion-7 {
-  background: #bdbdbd;
-}
-
 .emotion-9 {
   margin-right: 10px;
   height: 14px;

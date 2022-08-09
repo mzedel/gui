@@ -126,7 +126,7 @@ Devices that are in the middle of the deployment at the time of abort will finis
           class=\\"report-container margin-top-large margin-bottom-large\\"
         >
           <div
-            class=\\"break-all two-columns column-data  \\"
+            class=\\"break-all two-columns tss-11rvwt0-root  column-data \\"
             style=\\"align-items: center; align-self: flex-start; grid-template-columns: minmax(140px, 1fr) minmax(220px, 1fr); max-width: 25vw;\\"
           >
             <div
@@ -217,7 +217,7 @@ Devices that are in the middle of the deployment at the time of abort will finis
             class=\\"flexbox column\\"
           >
             <div
-              class=\\"break-all two-columns column-data  \\"
+              class=\\"break-all two-columns tss-11rvwt0-root  column-data \\"
               style=\\"align-items: center; align-self: flex-start; grid-template-columns: minmax(140px, 1fr) minmax(220px, 1fr); max-width: 25vw;\\"
             >
               <div
@@ -256,14 +256,14 @@ Devices that are in the middle of the deployment at the time of abort will finis
           </div>
         </div>
         <h4
-          class=\\"dashboard-header tss-hutgny-border \\"
+          class=\\"dashboard-header tss-hutgny-border tss-zr8z23-header\\"
         >
           <span>
             Status
           </span>
         </h4>
         <div
-          class=\\"progressStatus flexbox space-between centered margin-bottom \\"
+          class=\\"tss-qfhcfv-progressStatus flexbox space-between centered margin-bottom \\"
         >
           <div
             class=\\"flexbox column\\"
@@ -382,7 +382,7 @@ Devices that are in the middle of the deployment at the time of abort will finis
             </div>
           </div>
           <div
-            class=\\"break-all two-columns column-data  \\"
+            class=\\"break-all two-columns tss-11rvwt0-root  column-data \\"
             style=\\"align-items: center; align-self: flex-start; grid-template-columns: max-content 1fr; max-width: 25vw;\\"
           >
             <div
@@ -445,7 +445,6 @@ Devices that are in the middle of the deployment at the time of abort will finis
                 <th
                   class=\\"MuiTableCell-root MuiTableCell-head MuiTableCell-sizeMedium css-1ygcj2i-MuiTableCell-root\\"
                   scope=\\"col\\"
-                  style=\\"position: sticky; top: 0px; background: white; z-index: 1;\\"
                   tooltip=\\"id\\"
                 >
                   id
@@ -453,7 +452,6 @@ Devices that are in the middle of the deployment at the time of abort will finis
                 <th
                   class=\\"MuiTableCell-root MuiTableCell-head MuiTableCell-sizeMedium css-1ygcj2i-MuiTableCell-root\\"
                   scope=\\"col\\"
-                  style=\\"position: sticky; top: 0px; background: white; z-index: 1;\\"
                   tooltip=\\"Device type\\"
                 >
                   Device type
@@ -461,7 +459,6 @@ Devices that are in the middle of the deployment at the time of abort will finis
                 <th
                   class=\\"MuiTableCell-root MuiTableCell-head MuiTableCell-sizeMedium css-1ygcj2i-MuiTableCell-root\\"
                   scope=\\"col\\"
-                  style=\\"position: sticky; top: 0px; background: white; z-index: 1;\\"
                   tooltip=\\"Current software\\"
                 >
                   Current software
@@ -469,7 +466,6 @@ Devices that are in the middle of the deployment at the time of abort will finis
                 <th
                   class=\\"MuiTableCell-root MuiTableCell-head MuiTableCell-sizeMedium css-1ygcj2i-MuiTableCell-root\\"
                   scope=\\"col\\"
-                  style=\\"position: sticky; top: 0px; background: white; z-index: 1;\\"
                   tooltip=\\"Started\\"
                 >
                   Started
@@ -477,7 +473,6 @@ Devices that are in the middle of the deployment at the time of abort will finis
                 <th
                   class=\\"MuiTableCell-root MuiTableCell-head MuiTableCell-sizeMedium css-1ygcj2i-MuiTableCell-root\\"
                   scope=\\"col\\"
-                  style=\\"position: sticky; top: 0px; background: white; z-index: 1;\\"
                   tooltip=\\"Finished\\"
                 >
                   Finished
@@ -485,7 +480,6 @@ Devices that are in the middle of the deployment at the time of abort will finis
                 <th
                   class=\\"MuiTableCell-root MuiTableCell-head MuiTableCell-sizeMedium css-1ygcj2i-MuiTableCell-root\\"
                   scope=\\"col\\"
-                  style=\\"position: sticky; top: 0px; background: white; z-index: 1;\\"
                   tooltip=\\"Deployment status\\"
                 >
                   Deployment status
@@ -493,7 +487,6 @@ Devices that are in the middle of the deployment at the time of abort will finis
                 <th
                   class=\\"MuiTableCell-root MuiTableCell-head MuiTableCell-sizeMedium css-1ygcj2i-MuiTableCell-root\\"
                   scope=\\"col\\"
-                  style=\\"position: sticky; top: 0px; background: white; z-index: 1;\\"
                   tooltip=\\"\\"
                 />
               </tr>
@@ -663,7 +656,7 @@ Devices that are in the middle of the deployment at the time of abort will finis
           </div>
         </div>
         <h4
-          class=\\"dashboard-header tss-hutgny-border margin-top-large\\"
+          class=\\"dashboard-header tss-hutgny-border margin-top-large tss-zr8z23-header\\"
         >
           <span>
             Schedule details
@@ -673,7 +666,7 @@ Devices that are in the middle of the deployment at the time of abort will finis
           class=\\"flexbox\\"
         >
           <div
-            class=\\"break-all two-columns column-data  \\"
+            class=\\"break-all two-columns tss-11rvwt0-root  column-data \\"
             style=\\"align-items: center; align-self: flex-start; grid-template-columns: minmax(140px, 1fr) minmax(220px, 1fr); max-width: 25vw;\\"
           >
             <div
@@ -717,7 +710,7 @@ Devices that are in the middle of the deployment at the time of abort will finis
             />
           </svg>
           <div
-            class=\\"break-all two-columns column-data  \\"
+            class=\\"break-all two-columns tss-11rvwt0-root  column-data \\"
             style=\\"align-items: center; align-self: flex-start; grid-template-columns: minmax(140px, 1fr) minmax(220px, 1fr); max-width: 25vw;\\"
           >
             <div
@@ -735,7 +728,7 @@ Devices that are in the middle of the deployment at the time of abort will finis
           </div>
         </div>
         <div
-          class=\\"progress-chart-container margin-top\\"
+          class=\\"progress-chart-container margin-top tss-90is3n-container\\"
         >
           <div
             class=\\"progress-chart detailed\\"
@@ -793,7 +786,7 @@ Devices that are in the middle of the deployment at the time of abort will finis
               </span>
             </div>
             <div
-              class=\\"break-all two-columns column-data  \\"
+              class=\\"break-all two-columns tss-11rvwt0-root  column-data \\"
               style=\\"align-items: center; align-self: initial; grid-template-columns: minmax(140px, 1fr) minmax(220px, 1fr); max-width: 25vw;\\"
             >
               <div
@@ -833,8 +826,7 @@ Devices that are in the middle of the deployment at the time of abort will finis
         </div>
       </div>
       <hr
-        class=\\"MuiDivider-root MuiDivider-fullWidth MuiDivider-light css-xetjfm-MuiDivider-root\\"
-        style=\\"margin-top: 16px;\\"
+        class=\\"MuiDivider-root MuiDivider-fullWidth MuiDivider-light tss-12awelr-divider css-xetjfm-MuiDivider-root\\"
       />
     </div>
     <div

@@ -124,6 +124,18 @@ exports[`CreateGroupExplainer Component renders correctly 1`] = `
 }
 
 .emotion-6 {
+  -webkit-box-flex: 1;
+  -webkit-flex-grow: 1;
+  -ms-flex-positive: 1;
+  flex-grow: 1;
+  padding: 25px;
+}
+
+.emotion-7 {
+  color: #7b7b7b;
+}
+
+.emotion-8 {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -140,12 +152,16 @@ exports[`CreateGroupExplainer Component renders correctly 1`] = `
   font-size: 1.25rem;
 }
 
-.emotion-8 {
+.emotion-9 {
+  max-width: 100%;
+}
+
+.emotion-13 {
   color: rgba(0, 0, 0, 0.38);
   margin: 15px 0;
 }
 
-.emotion-10 {
+.emotion-16 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -164,11 +180,11 @@ exports[`CreateGroupExplainer Component renders correctly 1`] = `
   flex: 0 0 auto;
 }
 
-.emotion-10>:not(:first-of-type) {
+.emotion-16>:not(:first-of-type) {
   margin-left: 8px;
 }
 
-.emotion-11 {
+.emotion-17 {
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
@@ -215,39 +231,39 @@ exports[`CreateGroupExplainer Component renders correctly 1`] = `
   color: #1976d2;
 }
 
-.emotion-11::-moz-focus-inner {
+.emotion-17::-moz-focus-inner {
   border-style: none;
 }
 
-.emotion-11.Mui-disabled {
+.emotion-17.Mui-disabled {
   pointer-events: none;
   cursor: default;
 }
 
 @media print {
-  .emotion-11 {
+  .emotion-17 {
     -webkit-print-color-adjust: exact;
     color-adjust: exact;
   }
 }
 
-.emotion-11:hover {
+.emotion-17:hover {
   -webkit-text-decoration: none;
   text-decoration: none;
   background-color: rgba(25, 118, 210, 0.04);
 }
 
 @media (hover: none) {
-  .emotion-11:hover {
+  .emotion-17:hover {
     background-color: transparent;
   }
 }
 
-.emotion-11.Mui-disabled {
+.emotion-17.Mui-disabled {
   color: rgba(0, 0, 0, 0.26);
 }
 
-.emotion-12 {
+.emotion-18 {
   overflow: hidden;
   pointer-events: none;
   position: absolute;
@@ -297,8 +313,7 @@ exports[`CreateGroupExplainer Component renders correctly 1`] = `
           class="flexbox column"
         >
           <div
-            class="two-columns margin-bottom"
-            style="flex-grow: 1; padding: 25px;"
+            class="two-columns margin-bottom emotion-6"
           >
             <div
               class="margin-right-large"
@@ -308,10 +323,9 @@ exports[`CreateGroupExplainer Component renders correctly 1`] = `
               >
                 <svg
                   aria-hidden="true"
-                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall emotion-6"
+                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall emotion-7 emotion-8"
                   data-testid="LockOutlinedIcon"
                   focusable="false"
-                  style="color: rgb(123, 123, 123);"
                   viewBox="0 0 24 24"
                 >
                   <path
@@ -331,13 +345,12 @@ exports[`CreateGroupExplainer Component renders correctly 1`] = `
               </p>
             </div>
             <img
+              class="emotion-9"
               src="static-group-creation.gif"
-              style="max-width: 100%;"
             />
           </div>
           <div
-            class="two-columns lightestgrey"
-            style="flex-grow: 1; padding: 25px;"
+            class="two-columns emotion-6 non-enterprise"
           >
             <div
               class="margin-right-large"
@@ -347,10 +360,9 @@ exports[`CreateGroupExplainer Component renders correctly 1`] = `
               >
                 <svg
                   aria-hidden="true"
-                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall emotion-6"
+                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall emotion-7 emotion-8"
                   data-testid="AutorenewIcon"
                   focusable="false"
-                  style="color: rgb(123, 123, 123);"
                   viewBox="0 0 24 24"
                 >
                   <path
@@ -363,7 +375,7 @@ exports[`CreateGroupExplainer Component renders correctly 1`] = `
                   Dynamic group
                 </div>
                 <span
-                  class="emotion-8 uppercased"
+                  class="emotion-13 uppercased"
                   style="margin: 0px;"
                 >
                   Enterprise
@@ -375,7 +387,7 @@ exports[`CreateGroupExplainer Component renders correctly 1`] = `
                 You can set filters based on device attributes, and save them as a group. At any point in time, all devices that match the filters will be part of this group. This means that new devices will automatically join the group if they match the filters.
               </p>
               <p
-                class="emotion-8 "
+                class="emotion-13 "
               >
                 Dynamic grouping is only available to Enterprise users. 
                 <a
@@ -387,23 +399,23 @@ exports[`CreateGroupExplainer Component renders correctly 1`] = `
               </p>
             </div>
             <img
+              class="emotion-9"
               src="dynamic-group-creation.gif"
-              style="max-width: 100%;"
             />
           </div>
         </div>
       </div>
       <div
-        class="MuiDialogActions-root MuiDialogActions-spacing emotion-10"
+        class="MuiDialogActions-root MuiDialogActions-spacing emotion-16"
       >
         <button
-          class="MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  emotion-11"
+          class="MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  emotion-17"
           tabindex="0"
           type="button"
         >
           Close
           <span
-            class="MuiTouchRipple-root emotion-12"
+            class="MuiTouchRipple-root emotion-18"
           />
         </button>
       </div>

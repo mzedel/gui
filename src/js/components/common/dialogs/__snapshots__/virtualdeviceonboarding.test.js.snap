@@ -2,6 +2,10 @@
 
 exports[`VirtualDeviceOnboarding Component renders correctly 1`] = `
 .emotion-0 {
+  border: 1px solid;
+}
+
+.emotion-1 {
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
@@ -48,49 +52,49 @@ exports[`VirtualDeviceOnboarding Component renders correctly 1`] = `
   color: #1976d2;
 }
 
-.emotion-0::-moz-focus-inner {
+.emotion-1::-moz-focus-inner {
   border-style: none;
 }
 
-.emotion-0.Mui-disabled {
+.emotion-1.Mui-disabled {
   pointer-events: none;
   cursor: default;
 }
 
 @media print {
-  .emotion-0 {
+  .emotion-1 {
     -webkit-print-color-adjust: exact;
     color-adjust: exact;
   }
 }
 
-.emotion-0:hover {
+.emotion-1:hover {
   -webkit-text-decoration: none;
   text-decoration: none;
   background-color: rgba(25, 118, 210, 0.04);
 }
 
 @media (hover: none) {
-  .emotion-0:hover {
+  .emotion-1:hover {
     background-color: transparent;
   }
 }
 
-.emotion-0.Mui-disabled {
+.emotion-1.Mui-disabled {
   color: rgba(0, 0, 0, 0.26);
 }
 
-.emotion-1 {
+.emotion-2 {
   display: inherit;
   margin-right: 8px;
   margin-left: -4px;
 }
 
-.emotion-1>*:nth-of-type(1) {
+.emotion-2>*:nth-of-type(1) {
   font-size: 20px;
 }
 
-.emotion-2 {
+.emotion-3 {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -107,7 +111,7 @@ exports[`VirtualDeviceOnboarding Component renders correctly 1`] = `
   font-size: 1.5rem;
 }
 
-.emotion-3 {
+.emotion-4 {
   overflow: hidden;
   pointer-events: none;
   position: absolute;
@@ -137,20 +141,20 @@ exports[`VirtualDeviceOnboarding Component renders correctly 1`] = `
     </b>
   </p>
   <div
-    class="code"
+    class="code emotion-0 "
   >
     <button
-      class="MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  emotion-0"
+      class="MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  emotion-1"
       style="float: right; margin: -20px 0px 0px 10px;"
       tabindex="0"
       type="button"
     >
       <span
-        class="MuiButton-startIcon MuiButton-iconSizeMedium emotion-1"
+        class="MuiButton-startIcon MuiButton-iconSizeMedium emotion-2"
       >
         <svg
           aria-hidden="true"
-          class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium emotion-2"
+          class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium emotion-3"
           data-testid="FileCopyIcon"
           focusable="false"
           viewBox="0 0 24 24"
@@ -162,7 +166,7 @@ exports[`VirtualDeviceOnboarding Component renders correctly 1`] = `
       </span>
       Copy to clipboard
       <span
-        class="MuiTouchRipple-root emotion-3"
+        class="MuiTouchRipple-root emotion-4"
       />
     </button>
     <span

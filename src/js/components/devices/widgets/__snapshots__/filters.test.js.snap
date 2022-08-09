@@ -945,7 +945,7 @@ label[data-shrink=false]+.MuiInputBase-formControl .emotion-23:focus::-ms-input-
 }
 
 <div
-  class="MuiCollapse-root MuiCollapse-vertical filter-wrapper MuiCollapse-entered emotion-0"
+  class="MuiCollapse-root MuiCollapse-vertical  filter-wrapper MuiCollapse-entered emotion-0"
   style="min-height: 0px;"
 >
   <div

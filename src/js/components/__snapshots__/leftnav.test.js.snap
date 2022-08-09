@@ -2,7 +2,6 @@
 
 exports[`LeftNav Component renders correctly 1`] = `
 .emotion-0 {
-  background-color: #bdbdbd;
   border-right: 1px solid #e0e0e0;
 }
 

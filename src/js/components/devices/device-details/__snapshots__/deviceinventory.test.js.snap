@@ -109,7 +109,12 @@ exports[`DeviceInventory Component renders correctly 1`] = `
   border-radius: inherit;
 }
 
-.emotion-3 {
+.emotion-3 .key>b {
+  background-color: #bdbdbd;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.emotion-4 {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -127,7 +132,7 @@ exports[`DeviceInventory Component renders correctly 1`] = `
   color: #1976d2;
 }
 
-.emotion-5 {
+.emotion-7 {
   margin: 0;
   -webkit-flex-shrink: 0;
   -ms-flex-negative: 0;
@@ -181,7 +186,7 @@ exports[`DeviceInventory Component renders correctly 1`] = `
       style="margin-bottom: 5px;"
     >
       <div
-        class="break-all two-columns column-data compact multiple"
+        class="break-all two-columns emotion-3 compact column-data multiple"
       >
         <div
           class="align-right key muted"
@@ -197,7 +202,7 @@ exports[`DeviceInventory Component renders correctly 1`] = `
           <svg
             aria-hidden="true"
             aria-label="Copy to clipboard"
-            class="MuiSvgIcon-root MuiSvgIcon-colorPrimary MuiSvgIcon-fontSizeSmall margin-left-small fadeOut emotion-3"
+            class="MuiSvgIcon-root MuiSvgIcon-colorPrimary MuiSvgIcon-fontSizeSmall margin-left-small fadeOut emotion-4"
             data-mui-internal-clone-element="true"
             data-testid="FileCopyOutlinedIcon"
             focusable="false"
@@ -210,7 +215,7 @@ exports[`DeviceInventory Component renders correctly 1`] = `
         </div>
       </div>
       <div
-        class="break-all two-columns column-data compact multiple"
+        class="break-all two-columns emotion-3 compact column-data multiple"
       >
         <div
           class="align-right key muted"
@@ -226,7 +231,7 @@ exports[`DeviceInventory Component renders correctly 1`] = `
           <svg
             aria-hidden="true"
             aria-label="Copy to clipboard"
-            class="MuiSvgIcon-root MuiSvgIcon-colorPrimary MuiSvgIcon-fontSizeSmall margin-left-small fadeOut emotion-3"
+            class="MuiSvgIcon-root MuiSvgIcon-colorPrimary MuiSvgIcon-fontSizeSmall margin-left-small fadeOut emotion-4"
             data-mui-internal-clone-element="true"
             data-testid="FileCopyOutlinedIcon"
             focusable="false"
@@ -246,7 +251,7 @@ exports[`DeviceInventory Component renders correctly 1`] = `
     </a>
   </div>
   <hr
-    class="MuiDivider-root MuiDivider-fullWidth emotion-5"
+    class="MuiDivider-root MuiDivider-fullWidth emotion-7"
     style="margin-top: 24px;"
   />
 </div>

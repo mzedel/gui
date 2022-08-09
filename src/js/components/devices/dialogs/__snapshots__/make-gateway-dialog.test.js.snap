@@ -124,6 +124,10 @@ exports[`CreateGroupExplainerContent Component renders correctly 1`] = `
 }
 
 .emotion-6 {
+  border: 1px solid;
+}
+
+.emotion-7 {
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
@@ -170,49 +174,49 @@ exports[`CreateGroupExplainerContent Component renders correctly 1`] = `
   color: #1976d2;
 }
 
-.emotion-6::-moz-focus-inner {
+.emotion-7::-moz-focus-inner {
   border-style: none;
 }
 
-.emotion-6.Mui-disabled {
+.emotion-7.Mui-disabled {
   pointer-events: none;
   cursor: default;
 }
 
 @media print {
-  .emotion-6 {
+  .emotion-7 {
     -webkit-print-color-adjust: exact;
     color-adjust: exact;
   }
 }
 
-.emotion-6:hover {
+.emotion-7:hover {
   -webkit-text-decoration: none;
   text-decoration: none;
   background-color: rgba(25, 118, 210, 0.04);
 }
 
 @media (hover: none) {
-  .emotion-6:hover {
+  .emotion-7:hover {
     background-color: transparent;
   }
 }
 
-.emotion-6.Mui-disabled {
+.emotion-7.Mui-disabled {
   color: rgba(0, 0, 0, 0.26);
 }
 
-.emotion-7 {
+.emotion-8 {
   display: inherit;
   margin-right: 8px;
   margin-left: -4px;
 }
 
-.emotion-7>*:nth-of-type(1) {
+.emotion-8>*:nth-of-type(1) {
   font-size: 20px;
 }
 
-.emotion-8 {
+.emotion-9 {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -229,7 +233,7 @@ exports[`CreateGroupExplainerContent Component renders correctly 1`] = `
   font-size: 1.5rem;
 }
 
-.emotion-9 {
+.emotion-10 {
   overflow: hidden;
   pointer-events: none;
   position: absolute;
@@ -241,7 +245,7 @@ exports[`CreateGroupExplainerContent Component renders correctly 1`] = `
   border-radius: inherit;
 }
 
-.emotion-10 {
+.emotion-11 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -260,11 +264,11 @@ exports[`CreateGroupExplainerContent Component renders correctly 1`] = `
   flex: 0 0 auto;
 }
 
-.emotion-10>:not(:first-of-type) {
+.emotion-11>:not(:first-of-type) {
   margin-left: 8px;
 }
 
-.emotion-13 {
+.emotion-14 {
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
@@ -313,23 +317,23 @@ exports[`CreateGroupExplainerContent Component renders correctly 1`] = `
   box-shadow: 0px 3px 1px -2px rgba(0,0,0,0.2),0px 2px 2px 0px rgba(0,0,0,0.14),0px 1px 5px 0px rgba(0,0,0,0.12);
 }
 
-.emotion-13::-moz-focus-inner {
+.emotion-14::-moz-focus-inner {
   border-style: none;
 }
 
-.emotion-13.Mui-disabled {
+.emotion-14.Mui-disabled {
   pointer-events: none;
   cursor: default;
 }
 
 @media print {
-  .emotion-13 {
+  .emotion-14 {
     -webkit-print-color-adjust: exact;
     color-adjust: exact;
   }
 }
 
-.emotion-13:hover {
+.emotion-14:hover {
   -webkit-text-decoration: none;
   text-decoration: none;
   background-color: #7b1fa2;
@@ -337,20 +341,20 @@ exports[`CreateGroupExplainerContent Component renders correctly 1`] = `
 }
 
 @media (hover: none) {
-  .emotion-13:hover {
+  .emotion-14:hover {
     background-color: #9c27b0;
   }
 }
 
-.emotion-13:active {
+.emotion-14:active {
   box-shadow: 0px 5px 5px -3px rgba(0,0,0,0.2),0px 8px 10px 1px rgba(0,0,0,0.14),0px 3px 14px 2px rgba(0,0,0,0.12);
 }
 
-.emotion-13.Mui-focusVisible {
+.emotion-14.Mui-focusVisible {
   box-shadow: 0px 3px 5px -1px rgba(0,0,0,0.2),0px 6px 10px 0px rgba(0,0,0,0.14),0px 1px 18px 0px rgba(0,0,0,0.12);
 }
 
-.emotion-13.Mui-disabled {
+.emotion-14.Mui-disabled {
   color: rgba(0, 0, 0, 0.26);
   box-shadow: none;
   background-color: rgba(0, 0, 0, 0.12);
@@ -404,20 +408,20 @@ exports[`CreateGroupExplainerContent Component renders correctly 1`] = `
           if mender-connect is enabled on the device.
         </p>
         <div
-          class="code"
+          class="code emotion-6 "
         >
           <button
-            class="MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  emotion-6"
+            class="MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  emotion-7"
             style="float: right; margin: -20px 0px 0px 10px;"
             tabindex="0"
             type="button"
           >
             <span
-              class="MuiButton-startIcon MuiButton-iconSizeMedium emotion-7"
+              class="MuiButton-startIcon MuiButton-iconSizeMedium emotion-8"
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium emotion-8"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium emotion-9"
                 data-testid="FileCopyIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -429,7 +433,7 @@ exports[`CreateGroupExplainerContent Component renders correctly 1`] = `
             </span>
             Copy to clipboard
             <span
-              class="MuiTouchRipple-root emotion-9"
+              class="MuiTouchRipple-root emotion-10"
             />
           </button>
           <span
@@ -454,29 +458,29 @@ wget -O- https://get.mender.io | sudo bash -s -- --jwt-token $JWT_TOKEN mender-g
         </p>
       </div>
       <div
-        class="MuiDialogActions-root MuiDialogActions-spacing emotion-10"
+        class="MuiDialogActions-root MuiDialogActions-spacing emotion-11"
       >
         <button
-          class="MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  emotion-6"
+          class="MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  emotion-7"
           tabindex="0"
           type="button"
         >
           Cancel
           <span
-            class="MuiTouchRipple-root emotion-9"
+            class="MuiTouchRipple-root emotion-10"
           />
         </button>
         <div
           style="flex-grow: 1;"
         />
         <button
-          class="MuiButton-root MuiButton-contained MuiButton-containedSecondary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButtonBase-root  emotion-13"
+          class="MuiButton-root MuiButton-contained MuiButton-containedSecondary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButtonBase-root  emotion-14"
           tabindex="0"
           type="button"
         >
           Close
           <span
-            class="MuiTouchRipple-root emotion-9"
+            class="MuiTouchRipple-root emotion-10"
           />
         </button>
       </div>

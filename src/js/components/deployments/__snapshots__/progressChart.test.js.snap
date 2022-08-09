@@ -1,9 +1,27 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ProgressChart Component renders correctly 1`] = `
+.emotion-0 {
+  background-color: #bdbdbd;
+}
+
+.emotion-0 .progress-step {
+  border: none;
+  position: absolute;
+}
+
+.emotion-0 .progress-step-total .progress-bar {
+  background-color: #fafafa;
+}
+
+.emotion-0.stepped-progress .progress-step-total .progress-bar {
+  background-color: #fff;
+  border-color: #424242;
+}
+
 <div>
   <div
-    class="flexbox column progress-chart-container "
+    class="progress-chart-container flexbox column  emotion-0"
   >
     <div
       style="display: grid; grid-template-columns: 2fr 1fr;"

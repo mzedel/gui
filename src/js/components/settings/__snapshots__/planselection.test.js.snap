@@ -1,7 +1,26 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`PlanSelection component renders correctly 1`] = `
-.emotion-0 {
+.emotion-0.active,
+.emotion-0:hover {
+  border-color: #fafafa;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.15);
+}
+
+.emotion-0.active {
+  background-color: #bdbdbd;
+}
+
+.emotion-1 {
+  margin-bottom: -11px;
+  font-size: smaller;
+}
+
+.emotion-2 {
+  font-size: 1rem;
+}
+
+.emotion-3 {
   color: rgba(0, 0, 0, 0.38);
   margin: 15px 0;
 }
@@ -17,11 +36,10 @@ exports[`PlanSelection component renders correctly 1`] = `
     style="padding-bottom: 15px;"
   >
     <div
-      class="planPanel  "
+      class="planPanel emotion-0  "
     >
       <div
-        class="uppercased align-center muted"
-        style="margin-bottom: -11px; font-size: smaller;"
+        class="uppercased align-center muted emotion-1"
       >
         current plan
       </div>
@@ -31,8 +49,7 @@ exports[`PlanSelection component renders correctly 1`] = `
       </h4>
       <div>
         <div
-          class="link-color bold"
-          style="font-size: 1rem;"
+          class="link-color bold emotion-2"
         >
           $29/month
         </div>
@@ -45,7 +62,7 @@ exports[`PlanSelection component renders correctly 1`] = `
       >
         <li>
           <span
-            class="emotion-0 "
+            class="emotion-3 "
           >
             Basic OTA features
           </span>
@@ -53,11 +70,10 @@ exports[`PlanSelection component renders correctly 1`] = `
       </ul>
     </div>
     <div
-      class="planPanel  "
+      class="planPanel emotion-0  "
     >
       <div
-        class="uppercased align-center muted"
-        style="margin-bottom: -11px; font-size: smaller;"
+        class="uppercased align-center muted emotion-1"
       >
         upgrade
       </div>
@@ -67,8 +83,7 @@ exports[`PlanSelection component renders correctly 1`] = `
       </h4>
       <div>
         <div
-          class="link-color bold"
-          style="font-size: 1rem;"
+          class="link-color bold emotion-2"
         >
           $249/month
         </div>
@@ -81,14 +96,14 @@ exports[`PlanSelection component renders correctly 1`] = `
       >
         <li>
           <span
-            class="emotion-0 "
+            class="emotion-3 "
           >
             + Advanced OTA features
           </span>
         </li>
         <li>
           <span
-            class="emotion-0 "
+            class="emotion-3 "
           >
             + Standard support
           </span>
@@ -96,11 +111,10 @@ exports[`PlanSelection component renders correctly 1`] = `
       </ul>
     </div>
     <div
-      class="planPanel active "
+      class="planPanel emotion-0 active "
     >
       <div
-        class="uppercased align-center muted"
-        style="margin-bottom: -11px; font-size: smaller;"
+        class="uppercased align-center muted emotion-1"
       >
         upgrade
       </div>
@@ -110,8 +124,7 @@ exports[`PlanSelection component renders correctly 1`] = `
       </h4>
       <div>
         <div
-          class="link-color bold"
-          style="font-size: 1rem;"
+          class="link-color bold emotion-2"
         >
           Custom pricing
         </div>
@@ -124,14 +137,14 @@ exports[`PlanSelection component renders correctly 1`] = `
       >
         <li>
           <span
-            class="emotion-0 "
+            class="emotion-3 "
           >
             + Enterprise-grade OTA features
           </span>
         </li>
         <li>
           <span
-            class="emotion-0 "
+            class="emotion-3 "
           >
             + Premium support
           </span>

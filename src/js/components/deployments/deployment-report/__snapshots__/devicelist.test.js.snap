@@ -15,12 +15,10 @@ exports[`ProgressDeviceList Component renders correctly 1`] = `
         <th
           class=\\"MuiTableCell-root MuiTableCell-head MuiTableCell-sizeMedium css-1ygcj2i-MuiTableCell-root\\"
           scope=\\"col\\"
-          style=\\"position: sticky; top: 0px; background: white; z-index: 1;\\"
         />
         <th
           class=\\"MuiTableCell-root MuiTableCell-head MuiTableCell-sizeMedium css-1ygcj2i-MuiTableCell-root\\"
           scope=\\"col\\"
-          style=\\"position: sticky; top: 0px; background: white; z-index: 1;\\"
           tooltip=\\"Device type\\"
         >
           Device type
@@ -28,7 +26,6 @@ exports[`ProgressDeviceList Component renders correctly 1`] = `
         <th
           class=\\"MuiTableCell-root MuiTableCell-head MuiTableCell-sizeMedium css-1ygcj2i-MuiTableCell-root\\"
           scope=\\"col\\"
-          style=\\"position: sticky; top: 0px; background: white; z-index: 1;\\"
           tooltip=\\"Current software\\"
         >
           Current software
@@ -36,7 +33,6 @@ exports[`ProgressDeviceList Component renders correctly 1`] = `
         <th
           class=\\"MuiTableCell-root MuiTableCell-head MuiTableCell-sizeMedium css-1ygcj2i-MuiTableCell-root\\"
           scope=\\"col\\"
-          style=\\"position: sticky; top: 0px; background: white; z-index: 1;\\"
           tooltip=\\"Started\\"
         >
           Started
@@ -44,7 +40,6 @@ exports[`ProgressDeviceList Component renders correctly 1`] = `
         <th
           class=\\"MuiTableCell-root MuiTableCell-head MuiTableCell-sizeMedium css-1ygcj2i-MuiTableCell-root\\"
           scope=\\"col\\"
-          style=\\"position: sticky; top: 0px; background: white; z-index: 1;\\"
           tooltip=\\"Finished\\"
         >
           Finished
@@ -52,7 +47,6 @@ exports[`ProgressDeviceList Component renders correctly 1`] = `
         <th
           class=\\"MuiTableCell-root MuiTableCell-head MuiTableCell-sizeMedium css-1ygcj2i-MuiTableCell-root\\"
           scope=\\"col\\"
-          style=\\"position: sticky; top: 0px; background: white; z-index: 1;\\"
           tooltip=\\"Deployment status\\"
         >
           Deployment status
@@ -60,7 +54,6 @@ exports[`ProgressDeviceList Component renders correctly 1`] = `
         <th
           class=\\"MuiTableCell-root MuiTableCell-head MuiTableCell-sizeMedium css-1ygcj2i-MuiTableCell-root\\"
           scope=\\"col\\"
-          style=\\"position: sticky; top: 0px; background: white; z-index: 1;\\"
           tooltip=\\"\\"
         />
       </tr>

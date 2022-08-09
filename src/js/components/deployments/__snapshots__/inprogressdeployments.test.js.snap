@@ -14,18 +14,36 @@ exports[`InProgressDeployments Component renders correctly 1`] = `
 }
 
 .emotion-3 {
+  background-color: #bdbdbd;
+}
+
+.emotion-3 .progress-step {
+  border: none;
+  position: absolute;
+}
+
+.emotion-3 .progress-step-total .progress-bar {
+  background-color: #fafafa;
+}
+
+.emotion-3.stepped-progress .progress-step-total .progress-bar {
+  background-color: #fff;
+  border-color: #424242;
+}
+
+.emotion-4 {
   background-color: transparent;
   color: rgba(0, 0, 0, 0.87);
   justify-self: center;
   text-transform: none;
 }
 
-.emotion-3:hover {
+.emotion-4:hover {
   background-color: transparent;
   color: rgba(0, 0, 0, 0.87);
 }
 
-.emotion-4 {
+.emotion-5 {
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
@@ -74,23 +92,23 @@ exports[`InProgressDeployments Component renders correctly 1`] = `
   box-shadow: 0px 3px 1px -2px rgba(0,0,0,0.2),0px 2px 2px 0px rgba(0,0,0,0.14),0px 1px 5px 0px rgba(0,0,0,0.12);
 }
 
-.emotion-4::-moz-focus-inner {
+.emotion-5::-moz-focus-inner {
   border-style: none;
 }
 
-.emotion-4.Mui-disabled {
+.emotion-5.Mui-disabled {
   pointer-events: none;
   cursor: default;
 }
 
 @media print {
-  .emotion-4 {
+  .emotion-5 {
     -webkit-print-color-adjust: exact;
     color-adjust: exact;
   }
 }
 
-.emotion-4:hover {
+.emotion-5:hover {
   -webkit-text-decoration: none;
   text-decoration: none;
   background-color: #1565c0;
@@ -98,26 +116,26 @@ exports[`InProgressDeployments Component renders correctly 1`] = `
 }
 
 @media (hover: none) {
-  .emotion-4:hover {
+  .emotion-5:hover {
     background-color: #1976d2;
   }
 }
 
-.emotion-4:active {
+.emotion-5:active {
   box-shadow: 0px 5px 5px -3px rgba(0,0,0,0.2),0px 8px 10px 1px rgba(0,0,0,0.14),0px 3px 14px 2px rgba(0,0,0,0.12);
 }
 
-.emotion-4.Mui-focusVisible {
+.emotion-5.Mui-focusVisible {
   box-shadow: 0px 3px 5px -1px rgba(0,0,0,0.2),0px 6px 10px 0px rgba(0,0,0,0.14),0px 1px 18px 0px rgba(0,0,0,0.12);
 }
 
-.emotion-4.Mui-disabled {
+.emotion-5.Mui-disabled {
   color: rgba(0, 0, 0, 0.26);
   box-shadow: none;
   background-color: rgba(0, 0, 0, 0.12);
 }
 
-.emotion-5 {
+.emotion-6 {
   overflow: hidden;
   pointer-events: none;
   position: absolute;
@@ -129,7 +147,7 @@ exports[`InProgressDeployments Component renders correctly 1`] = `
   border-radius: inherit;
 }
 
-.emotion-6 {
+.emotion-7 {
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
@@ -177,38 +195,38 @@ exports[`InProgressDeployments Component renders correctly 1`] = `
   font-size: 1.75rem;
 }
 
-.emotion-6::-moz-focus-inner {
+.emotion-7::-moz-focus-inner {
   border-style: none;
 }
 
-.emotion-6.Mui-disabled {
+.emotion-7.Mui-disabled {
   pointer-events: none;
   cursor: default;
 }
 
 @media print {
-  .emotion-6 {
+  .emotion-7 {
     -webkit-print-color-adjust: exact;
     color-adjust: exact;
   }
 }
 
-.emotion-6:hover {
+.emotion-7:hover {
   background-color: rgba(0, 0, 0, 0.04);
 }
 
 @media (hover: none) {
-  .emotion-6:hover {
+  .emotion-7:hover {
     background-color: transparent;
   }
 }
 
-.emotion-6.Mui-disabled {
+.emotion-7.Mui-disabled {
   background-color: transparent;
   color: rgba(0, 0, 0, 0.26);
 }
 
-.emotion-7 {
+.emotion-8 {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -226,6 +244,19 @@ exports[`InProgressDeployments Component renders correctly 1`] = `
 }
 
 .emotion-10 {
+  border-color: rgba(0, 0, 0, 0.06);
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.emotion-10 .dashboard-header span {
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.emotion-10 .MuiButtonBase-root {
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.emotion-12 {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -379,7 +410,7 @@ exports[`InProgressDeployments Component renders correctly 1`] = `
               Status
             </span>
             <div
-              class="flexbox column progress-chart-container "
+              class="progress-chart-container flexbox column  emotion-3"
             >
               <div
                 style="display: grid; grid-template-columns: 2fr 1fr;"
@@ -436,25 +467,25 @@ exports[`InProgressDeployments Component renders correctly 1`] = `
             </div>
           </div>
           <button
-            class="MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButtonBase-root emotion-3 emotion-4"
+            class="MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButtonBase-root emotion-4 emotion-5"
             tabindex="0"
             type="button"
           >
             View details
             <span
-              class="MuiTouchRipple-root emotion-5"
+              class="MuiTouchRipple-root emotion-6"
             />
           </button>
           <button
             aria-label="Abort"
-            class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeLarge columnHeader emotion-6"
+            class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeLarge columnHeader emotion-7"
             data-mui-internal-clone-element="true"
             tabindex="0"
             type="button"
           >
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium cancelButton muted emotion-7"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium cancelButton muted emotion-8"
               data-testid="CancelOutlinedIcon"
               focusable="false"
               viewBox="0 0 24 24"
@@ -464,7 +495,7 @@ exports[`InProgressDeployments Component renders correctly 1`] = `
               />
             </svg>
             <span
-              class="MuiTouchRipple-root emotion-5"
+              class="MuiTouchRipple-root emotion-6"
             />
           </button>
         </div>
@@ -472,7 +503,7 @@ exports[`InProgressDeployments Component renders correctly 1`] = `
     </div>
   </div>
   <div
-    class="deployments-pending margin-top margin-bottom-large"
+    class="deployments-pending margin-top margin-bottom-large emotion-10"
   >
     <h4
       class="dashboard-header emotion-0 margin-small margin-top"
@@ -609,7 +640,7 @@ exports[`InProgressDeployments Component renders correctly 1`] = `
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit emotion-10"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit emotion-12"
                 focusable="false"
                 viewBox="0 0 24 24"
               >
@@ -625,25 +656,25 @@ exports[`InProgressDeployments Component renders correctly 1`] = `
             </div>
           </div>
           <button
-            class="MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButtonBase-root emotion-3 emotion-4"
+            class="MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButtonBase-root emotion-4 emotion-5"
             tabindex="0"
             type="button"
           >
             View details
             <span
-              class="MuiTouchRipple-root emotion-5"
+              class="MuiTouchRipple-root emotion-6"
             />
           </button>
           <button
             aria-label="Abort"
-            class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeLarge columnHeader emotion-6"
+            class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeLarge columnHeader emotion-7"
             data-mui-internal-clone-element="true"
             tabindex="0"
             type="button"
           >
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium cancelButton muted emotion-7"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium cancelButton muted emotion-8"
               data-testid="CancelOutlinedIcon"
               focusable="false"
               viewBox="0 0 24 24"
@@ -653,7 +684,7 @@ exports[`InProgressDeployments Component renders correctly 1`] = `
               />
             </svg>
             <span
-              class="MuiTouchRipple-root emotion-5"
+              class="MuiTouchRipple-root emotion-6"
             />
           </button>
         </div>

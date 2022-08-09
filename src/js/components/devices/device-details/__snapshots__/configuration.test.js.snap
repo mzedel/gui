@@ -290,7 +290,12 @@ exports[`Configuration Component renders correctly 1`] = `
   color: rgba(0, 0, 0, 0.26);
 }
 
-.emotion-8 {
+.emotion-8 .key>b {
+  background-color: #bdbdbd;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.emotion-9 {
   margin: 0;
   -webkit-flex-shrink: 0;
   -ms-flex-negative: 0;
@@ -382,7 +387,7 @@ exports[`Configuration Component renders correctly 1`] = `
   </div>
   <div>
     <div
-      class="break-all two-columns column-data  margin-top"
+      class="break-all two-columns emotion-8  column-data margin-top"
       style="margin-bottom: 10px;"
     >
       <div
@@ -403,7 +408,7 @@ exports[`Configuration Component renders correctly 1`] = `
     </a>
   </div>
   <hr
-    class="MuiDivider-root MuiDivider-fullWidth emotion-8"
+    class="MuiDivider-root MuiDivider-fullWidth emotion-9"
     style="margin-top: 24px;"
   />
 </div>

@@ -1,7 +1,17 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`AddOnSelection component renders correctly 1`] = `
-.emotion-0 {
+.emotion-0.active,
+.emotion-0:hover {
+  border-color: #fafafa;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.15);
+}
+
+.emotion-0.active {
+  background-color: #bdbdbd;
+}
+
+.emotion-1 {
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
@@ -39,42 +49,42 @@ exports[`AddOnSelection component renders correctly 1`] = `
   color: rgba(0, 0, 0, 0.6);
 }
 
-.emotion-0::-moz-focus-inner {
+.emotion-1::-moz-focus-inner {
   border-style: none;
 }
 
-.emotion-0.Mui-disabled {
+.emotion-1.Mui-disabled {
   pointer-events: none;
   cursor: default;
 }
 
 @media print {
-  .emotion-0 {
+  .emotion-1 {
     -webkit-print-color-adjust: exact;
     color-adjust: exact;
   }
 }
 
-.emotion-0:hover {
+.emotion-1:hover {
   background-color: rgba(25, 118, 210, 0.04);
 }
 
 @media (hover: none) {
-  .emotion-0:hover {
+  .emotion-1:hover {
     background-color: transparent;
   }
 }
 
-.emotion-0.Mui-checked,
-.emotion-0.MuiCheckbox-indeterminate {
+.emotion-1.Mui-checked,
+.emotion-1.MuiCheckbox-indeterminate {
   color: #1976d2;
 }
 
-.emotion-0.Mui-disabled {
+.emotion-1.Mui-disabled {
   color: rgba(0, 0, 0, 0.26);
 }
 
-.emotion-1 {
+.emotion-2 {
   cursor: inherit;
   position: absolute;
   opacity: 0;
@@ -87,7 +97,7 @@ exports[`AddOnSelection component renders correctly 1`] = `
   z-index: 1;
 }
 
-.emotion-2 {
+.emotion-3 {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -104,7 +114,7 @@ exports[`AddOnSelection component renders correctly 1`] = `
   font-size: 1.5rem;
 }
 
-.emotion-3 {
+.emotion-4 {
   overflow: hidden;
   pointer-events: none;
   position: absolute;
@@ -116,7 +126,11 @@ exports[`AddOnSelection component renders correctly 1`] = `
   border-radius: inherit;
 }
 
-.emotion-4 {
+.emotion-5 {
+  font-size: 1rem;
+}
+
+.emotion-6 {
   color: rgba(0, 0, 0, 0.38);
   margin: 15px 0;
 }
@@ -134,20 +148,20 @@ exports[`AddOnSelection component renders correctly 1`] = `
       Extend Mender features with our add-ons. Select one or more from the list and submit to request add-ons to be added to your plan. We'll adjust your subscription and confirm it with you.
     </p>
     <div
-      class="planPanel flexbox center-aligned "
+      class="planPanel emotion-0 flexbox center-aligned "
       style="margin-top: 10px;"
     >
       <span
-        class="MuiCheckbox-root MuiCheckbox-colorPrimary MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary PrivateSwitchBase-root emotion-0"
+        class="MuiCheckbox-root MuiCheckbox-colorPrimary MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary PrivateSwitchBase-root emotion-1"
       >
         <input
-          class="PrivateSwitchBase-input emotion-1"
+          class="PrivateSwitchBase-input emotion-2"
           data-indeterminate="false"
           type="checkbox"
         />
         <svg
           aria-hidden="true"
-          class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium emotion-2"
+          class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium emotion-3"
           data-testid="CheckBoxOutlineBlankIcon"
           focusable="false"
           viewBox="0 0 24 24"
@@ -157,7 +171,7 @@ exports[`AddOnSelection component renders correctly 1`] = `
           />
         </svg>
         <span
-          class="MuiTouchRipple-root emotion-3"
+          class="MuiTouchRipple-root emotion-4"
         />
       </span>
       <div
@@ -171,8 +185,7 @@ exports[`AddOnSelection component renders correctly 1`] = `
         style="min-width: 120px;"
       >
         <div
-          class="link-color bold"
-          style="font-size: 1rem;"
+          class="link-color bold emotion-5"
         >
           $10/month
         </div>
@@ -181,7 +194,7 @@ exports[`AddOnSelection component renders correctly 1`] = `
         </div>
       </div>
       <span
-        class="emotion-4 "
+        class="emotion-6 "
       >
         Expand your plan with device configuration features
       </span>
@@ -195,20 +208,20 @@ exports[`AddOnSelection component renders correctly 1`] = `
       </a>
     </div>
     <div
-      class="planPanel flexbox center-aligned "
+      class="planPanel emotion-0 flexbox center-aligned "
       style="margin-top: 10px;"
     >
       <span
-        class="MuiCheckbox-root MuiCheckbox-colorPrimary MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary PrivateSwitchBase-root emotion-0"
+        class="MuiCheckbox-root MuiCheckbox-colorPrimary MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary PrivateSwitchBase-root emotion-1"
       >
         <input
-          class="PrivateSwitchBase-input emotion-1"
+          class="PrivateSwitchBase-input emotion-2"
           data-indeterminate="false"
           type="checkbox"
         />
         <svg
           aria-hidden="true"
-          class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium emotion-2"
+          class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium emotion-3"
           data-testid="CheckBoxOutlineBlankIcon"
           focusable="false"
           viewBox="0 0 24 24"
@@ -218,7 +231,7 @@ exports[`AddOnSelection component renders correctly 1`] = `
           />
         </svg>
         <span
-          class="MuiTouchRipple-root emotion-3"
+          class="MuiTouchRipple-root emotion-4"
         />
       </span>
       <div
@@ -232,8 +245,7 @@ exports[`AddOnSelection component renders correctly 1`] = `
         style="min-width: 120px;"
       >
         <div
-          class="link-color bold"
-          style="font-size: 1rem;"
+          class="link-color bold emotion-5"
         >
           $24/month
         </div>
@@ -242,7 +254,7 @@ exports[`AddOnSelection component renders correctly 1`] = `
         </div>
       </div>
       <span
-        class="emotion-4 "
+        class="emotion-6 "
       >
         Expand your plan with device troubleshooting features
       </span>

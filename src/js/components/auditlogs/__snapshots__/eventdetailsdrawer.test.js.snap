@@ -56,6 +56,10 @@ exports[`EventDetailsDrawer Component renders correctly 1`] = `
 }
 
 .emotion-3 {
+  border: 1px solid;
+}
+
+.emotion-4 {
   margin: 0;
   -webkit-flex-shrink: 0;
   -ms-flex-negative: 0;
@@ -94,7 +98,7 @@ exports[`EventDetailsDrawer Component renders correctly 1`] = `
     class="MuiDivider-root MuiDivider-fullWidth emotion-2"
   />
   <div
-    class="code flexbox column"
+    class="code emotion-3 flexbox column"
   >
     <span
       class=""
@@ -103,7 +107,7 @@ exports[`EventDetailsDrawer Component renders correctly 1`] = `
     </span>
   </div>
   <hr
-    class="MuiDivider-root MuiDivider-fullWidth MuiDivider-light emotion-3"
+    class="MuiDivider-root MuiDivider-fullWidth MuiDivider-light emotion-4"
     style="margin-top: 16px;"
   />
 </div>
