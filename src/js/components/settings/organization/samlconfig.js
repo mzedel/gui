@@ -61,11 +61,6 @@ export const SAMLConfig = ({ configs, onCancel, onSave, setSnackbar }) => {
   useEffect(() => {
     setHasSSOConfig(!!config);
     setFileContent(config?.config || '');
-    console.log('asdkasjdlasdj kjakjsadk jkaj');
-    console.log(!!config);
-    console.log(config?.config);
-    console.log(config?.id);
-    console.log('asdkasjdlasdj kjakjsadk jkaj');
     if (config?.config) {
       setConfigDetails(defaultDetails.map(item => ({ ...item, value: item.getValue(config.id) })));
     }
