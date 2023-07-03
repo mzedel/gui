@@ -1,3 +1,16 @@
+// Copyright 2019 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import React, { useState } from 'react';
 
 // material ui
@@ -6,10 +19,11 @@ import { Button, IconButton, Tooltip } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 
 import { DEPLOYMENT_STATES, DEPLOYMENT_TYPES } from '../../constants/deploymentConstants';
-import { getDeploymentState } from '../../helpers';
+import { FileSize, getDeploymentState } from '../../helpers';
 import Confirm from '../common/confirm';
 import { RelativeTime } from '../common/time';
 import { PhaseProgressDisplay } from './deployment-report/phaseprogress';
+import { getDeploymentTargetText } from './deployment-wizard/softwaredevices';
 import DeploymentStats from './deploymentstatus';
 import ProgressDisplay, { DeploymentStatusNotification } from './progressChart';
 
@@ -25,8 +39,8 @@ export const DeploymentDeviceCount = ({ className, deployment }) => (
     {Math.max(deployment.device_count || 0, deployment.max_devices || 0)}
   </div>
 );
-export const DeploymentDeviceGroup = ({ deployment: { name, type = DEPLOYMENT_TYPES.software, devices = {} }, wrappingClass }) => {
-  const deploymentName = (type === DEPLOYMENT_TYPES.configuration ? Object.keys(devices).join(', ') : name) || name;
+export const DeploymentDeviceGroup = ({ deployment, idAttribute, wrappingClass }) => {
+  const deploymentName = getDeploymentTargetText({ deployment, idAttribute });
   return (
     <div className={wrappingClass} key="DeploymentDeviceGroup" title={deploymentName}>
       {deploymentName}
@@ -57,6 +71,8 @@ export const DeploymentStartTime = ({ direction = 'both', started }) => <Relativ
 
 export const DeploymentStatus = ({ deployment }) => <DeploymentStats key="DeploymentStatus" deployment={deployment} />;
 
+export const DeploymentSize = ({ deployment: { total_size } }) => <div className="align-right">{total_size ? <FileSize fileSize={total_size} /> : '-'}</div>;
+
 const useStyles = makeStyles()(theme => ({
   detailsButton: {
     backgroundColor: 'transparent',
@@ -71,7 +87,7 @@ const useStyles = makeStyles()(theme => ({
   textWrapping: { whiteSpace: 'initial' }
 }));
 
-export const DeploymentItem = ({ abort: abortDeployment, canConfigure, canDeploy, columnHeaders, deployment, isEnterprise, openReport, type }) => {
+export const DeploymentItem = ({ abort: abortDeployment, canConfigure, canDeploy, columnHeaders, deployment, idAttribute, isEnterprise, openReport, type }) => {
   const [abort, setAbort] = useState(null);
   const { classes } = useStyles();
 
@@ -94,7 +110,14 @@ export const DeploymentItem = ({ abort: abortDeployment, canConfigure, canDeploy
         return (
           <div className={column.class} key={`deploy-item-${i}`}>
             {column.title && <span className="deployment-item-title muted">{column.title}</span>}
-            <ColumnComponent className={column.class || ''} deployment={deployment} started={started} wrappingClass={wrappingClass} {...column.props} />
+            <ColumnComponent
+              className={column.class || ''}
+              idAttribute={idAttribute}
+              deployment={deployment}
+              started={started}
+              wrappingClass={wrappingClass}
+              {...column.props}
+            />
           </div>
         );
       })}

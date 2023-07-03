@@ -1,3 +1,16 @@
+// Copyright 2022 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { connect } from 'react-redux';
 
@@ -9,7 +22,9 @@ import { makeStyles } from 'tss-react/mui';
 import DeltaIcon from '../../../assets/img/deltaicon.svg';
 import { getDeploymentsConfig, saveDeltaDeploymentsConfig } from '../../actions/deploymentActions';
 import { TIMEOUTS } from '../../constants/appConstants';
+import { getTenantCapabilities } from '../../selectors';
 import { useDebounce } from '../../utils/debouncehook';
+import EnterpriseNotification from '../common/enterpriseNotification';
 import InfoText from '../common/infotext';
 
 const useStyles = makeStyles()(theme => ({
@@ -64,7 +79,7 @@ const NumberInputLimited = ({ limit, onChange, value: propsValue, ...remainder }
   );
 };
 
-export const ArtifactGenerationSettings = ({ deltaConfig, deltaEnabled, deltaLimits, getDeploymentsConfig, saveDeltaDeploymentsConfig }) => {
+export const ArtifactGenerationSettings = ({ deltaConfig, deltaEnabled, deltaLimits, getDeploymentsConfig, isEnterprise, saveDeltaDeploymentsConfig }) => {
   const [timeoutValue, setTimeoutValue] = useState(deltaConfig.timeout);
   const [disableChecksum, setDisableChecksum] = useState(deltaConfig.disableChecksum);
   const [disableDecompression, setDisableDecompression] = useState(deltaConfig.disableChecksum);
@@ -185,7 +200,7 @@ export const ArtifactGenerationSettings = ({ deltaConfig, deltaEnabled, deltaLim
             ))}
           </div>
         </div>
-      ) : (
+      ) : isEnterprise ? (
         <InfoText>
           <InfoOutlinedIcon style={{ fontSize: '14px', margin: '0 4px 4px 0', verticalAlign: 'middle' }} />
           Automatic delta artifacts generation is not enabled in your account. If you want to start using this feature,{' '}
@@ -194,6 +209,11 @@ export const ArtifactGenerationSettings = ({ deltaConfig, deltaEnabled, deltaLim
           </a>
           .
         </InfoText>
+      ) : (
+        <EnterpriseNotification
+          isEnterprise={isEnterprise}
+          benefit="automatic delta artifacts generation to minimize data transfer and improve the update delivery"
+        />
       )}
     </div>
   );
@@ -203,10 +223,12 @@ const actionCreators = { getDeploymentsConfig, saveDeltaDeploymentsConfig };
 
 const mapStateToProps = state => {
   const { binaryDelta = {}, binaryDeltaLimits = {}, hasDelta } = state.deployments.config ?? {};
+  const { isEnterprise } = getTenantCapabilities(state);
   return {
     deltaConfig: binaryDelta,
     deltaEnabled: hasDelta,
-    deltaLimits: binaryDeltaLimits
+    deltaLimits: binaryDeltaLimits,
+    isEnterprise
   };
 };
 

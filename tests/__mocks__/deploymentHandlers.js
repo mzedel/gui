@@ -1,3 +1,16 @@
+// Copyright 2020 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import { rest } from 'msw';
 
 import { deploymentsApiUrl, deploymentsApiUrlV2 } from '../../src/js/actions/deploymentActions';
@@ -76,7 +89,7 @@ export const deploymentHandlers = [
     if (deployment_ids.includes(createdDeployment.id)) {
       return res(ctx.json([]));
     } else if (deployment_ids.every(id => defaultState.deployments.byId[id])) {
-      const stats = deployment_ids.map(id => ({ id, stats: defaultState.deployments.byId[id].stats }));
+      const stats = deployment_ids.map(id => ({ id, stats: defaultState.deployments.byId[id].statistics.status }));
       return res(ctx.json(stats));
     }
     return res(ctx.status(522));

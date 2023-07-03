@@ -1,3 +1,16 @@
+// Copyright 2020 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import React from 'react';
 
 import SignupHero from '../../../../assets/img/signuphero.svg';
@@ -46,12 +59,16 @@ export const UserDataEntry = ({ classes, data = {}, setSnackbar, onSubmit }) => 
         <EntryLink target="login" />
       </div>
       <div className={`${classes.userData} right`}>
-        <h2>Connect up to 10 devices free for 12 months – no credit card required.</h2>
-        <p>
-          Mender provides a complete over-the-air update infrastructure for all device software. Whether in the field or the factory, you can remotely and
-          easily manage device software without the need for manual labor.
-        </p>
-        <SignupHero />
+        <div className="flexbox column">
+          <h2>Connect up to 10 devices free for 12 months – no credit card required.</h2>
+          <p>
+            Mender provides a complete over-the-air update infrastructure for all device software. Whether in the field or the factory, you can remotely and
+            easily manage device software without the need for manual labor.
+          </p>
+          <div className="svg-container margin-top">
+            <SignupHero />
+          </div>
+        </div>
       </div>
     </div>
   );

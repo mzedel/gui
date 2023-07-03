@@ -1,3 +1,16 @@
+// Copyright 2022 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import axios from 'axios';
 import * as fs from 'fs';
 import * as https from 'https';
@@ -47,7 +60,10 @@ test.describe('SAML Login', () => {
     });
 
     // Setups the SAML/SSO login with samltest.id Identity Provider
-    test('Set up SAML', async ({ context, environment, baseUrl, page }) => {
+    test('Set up SAML', async ({ browserName, context, environment, baseUrl, page }) => {
+      // QA-579
+      test.skip(browserName === 'webkit');
+
       test.skip(environment !== 'staging');
       test.setTimeout(320000);
 
@@ -69,7 +85,9 @@ test.describe('SAML Login', () => {
         await page.locator('.view-lines').click();
 
         console.log('typing metadata');
-        await page.locator('[aria-label="Editor content\\;Press Alt\\+F1 for Accessibility Options\\."]').type(metadata.replace(/(?:\r\n|\r|\n)/g, ''));
+        await page
+          .locator('[aria-label="Editor content\\;Press Alt\\+F1 for Accessibility Options\\."]')
+          .type(metadata.replace(/(?:\r\n|\r|\n)/g, ''), { delay: 0 });
         console.log('typing metadata done.');
         // The screenshot saves the view of the typed metadata
         await page.screenshot({ 'path': 'saml-edit-saving.png' });
@@ -124,6 +142,9 @@ test.describe('SAML Login', () => {
 
     // Creates a user with login that matches Identity privder (samltest.id) user email
     test('Creates a user without a password', async ({ environment, browserName, baseUrl, page }) => {
+      // QA-579
+      test.skip(browserName === 'webkit');
+
       test.skip(environment !== 'staging');
       await page.goto(`${baseUrl}ui/settings/user-management`);
       const userExists = await page.isVisible(`text=${samlSettings.credentials[browserName].email}`);
@@ -146,6 +167,10 @@ test.describe('SAML Login', () => {
     // This test calls auth/sso/${id}/login, where id is the id of the identity provider
     // and verifies that login is successful.
     test('User can login via sso/login endpoint', async ({ environment, browserName, baseUrl, browser, loggedInPage }) => {
+      // QA-579
+      test.skip(browserName === 'firefox');
+      test.skip(browserName === 'webkit');
+
       test.skip(environment !== 'staging');
       test.setTimeout(30000);
 

@@ -1,7 +1,21 @@
 'use strict';
 
+// Copyright 2015 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import { apiUrl } from '../api/general-api';
 import { ALL_DEVICES } from './deviceConstants';
+import { ALL_RELEASES } from './releaseConstants';
 
 export const useradmApiUrlv1 = `${apiUrl.v1}/useradm`;
 export const useradmApiUrlv2 = `${apiUrl.v2}/useradm`;
@@ -97,6 +111,7 @@ export const uiPermissionsById = {
   },
   upload: {
     explanations: { groups: `'Upload' allows the user to upload new Artifacts.` },
+    unscopedOnly: { releases: true },
     permissionLevel: 1,
     permissionSets: { releases: permissionSetIds.UploadArtifacts },
     title: 'Upload',
@@ -106,70 +121,70 @@ export const uiPermissionsById = {
 };
 
 export const defaultPermissionSets = {
-  [permissionSetIds.Basic]: { value: permissionSetIds.Basic },
-  [permissionSetIds.SuperUser]: { value: permissionSetIds.SuperUser },
+  [permissionSetIds.Basic]: { name: permissionSetIds.Basic },
+  [permissionSetIds.SuperUser]: { name: permissionSetIds.SuperUser },
   [permissionSetIds.ManageUsers]: {
-    value: permissionSetIds.ManageUsers,
+    name: permissionSetIds.ManageUsers,
     result: {
       userManagement: [uiPermissionsById.manage.value]
     }
   },
   [permissionSetIds.ReadAuditLogs]: {
-    value: permissionSetIds.ReadAuditLogs,
+    name: permissionSetIds.ReadAuditLogs,
     result: {
       auditlog: [uiPermissionsById.read.value]
     }
   },
   [permissionSetIds.ReadReleases]: {
-    value: permissionSetIds.ReadReleases,
+    name: permissionSetIds.ReadReleases,
     result: {
-      releases: [uiPermissionsById.read.value]
+      releases: { [ALL_RELEASES]: [uiPermissionsById.read.value] }
     }
   },
   [permissionSetIds.ReadUsers]: {
-    value: permissionSetIds.ReadUsers,
+    name: permissionSetIds.ReadUsers,
     result: {
       userManagement: [uiPermissionsById.read.value]
     }
   },
   [permissionSetIds.UploadArtifacts]: {
-    value: permissionSetIds.UploadArtifacts,
+    name: permissionSetIds.UploadArtifacts,
     result: {
-      releases: [uiPermissionsById.upload.value]
+      releases: { [ALL_RELEASES]: [uiPermissionsById.upload.value] }
     }
   },
   [permissionSetIds.ManageReleases]: {
-    value: permissionSetIds.ManageReleases,
+    name: permissionSetIds.ManageReleases,
     result: {
-      releases: [uiPermissionsById.manage.value]
+      releases: { [ALL_RELEASES]: [uiPermissionsById.manage.value] }
     }
   },
   [permissionSetIds.ConfigureDevices]: {
-    value: permissionSetIds.ConfigureDevices,
+    name: permissionSetIds.ConfigureDevices,
     result: {
       groups: { [ALL_DEVICES]: [uiPermissionsById.configure.value] }
     }
   },
   [permissionSetIds.ConnectToDevices]: {
-    value: permissionSetIds.ConnectToDevices,
+    name: permissionSetIds.ConnectToDevices,
     result: {
       groups: { [ALL_DEVICES]: [uiPermissionsById.connect.value] }
     }
   },
   [permissionSetIds.DeployToDevices]: {
-    value: permissionSetIds.DeployToDevices,
+    name: permissionSetIds.DeployToDevices,
     result: {
       groups: { [ALL_DEVICES]: [uiPermissionsById.deploy.value] }
     }
   },
   [permissionSetIds.ManageDevices]: {
-    value: permissionSetIds.ManageDevices,
+    name: permissionSetIds.ManageDevices,
     result: {
       groups: { [ALL_DEVICES]: [uiPermissionsById.manage.value] }
     }
   },
   [permissionSetIds.ReadDevices]: {
-    value: permissionSetIds.ReadDevices,
+    name: permissionSetIds.ReadDevices,
     result: {
       groups: { [ALL_DEVICES]: [uiPermissionsById.read.value] }
     }
@@ -229,6 +244,7 @@ export const uiPermissionsByArea = {
       }
     ],
     explanation: 'Release permissions can be granted to allow artifact & release modifications, as well as the creation of new releases.',
+    scope: 'ReleaseTags',
     uiPermissions: [uiPermissionsById.read, uiPermissionsById.manage, uiPermissionsById.upload],
     title: 'Releases'
   },
@@ -248,7 +264,7 @@ export const emptyUiPermissions = Object.freeze({
   auditlog: [],
   deployments: [],
   groups: Object.freeze({}),
-  releases: [],
+  releases: Object.freeze({}),
   userManagement: []
 });
 
@@ -260,6 +276,7 @@ export const emptyRole = Object.freeze({
 });
 
 const permissionMapper = permission => permission.value;
+export const itemUiPermissionsReducer = (accu, { item, uiPermissions }) => (item ? { ...accu, [item]: uiPermissions } : accu);
 
 export const rolesById = Object.freeze({
   [staticRolesByName.admin]: {
@@ -272,7 +289,7 @@ export const rolesById = Object.freeze({
       auditlog: uiPermissionsByArea.auditlog.uiPermissions.map(permissionMapper),
       deployments: uiPermissionsByArea.deployments.uiPermissions.map(permissionMapper),
       groups: { [ALL_DEVICES]: uiPermissionsByArea.groups.uiPermissions.map(permissionMapper) },
-      releases: uiPermissionsByArea.releases.uiPermissions.map(permissionMapper),
+      releases: { [ALL_RELEASES]: uiPermissionsByArea.releases.uiPermissions.map(permissionMapper) },
       userManagement: uiPermissionsByArea.userManagement.uiPermissions.map(permissionMapper)
     }
   },
@@ -285,7 +302,7 @@ export const rolesById = Object.freeze({
       ...emptyUiPermissions,
       deployments: [uiPermissionsById.read.value],
       groups: { [ALL_DEVICES]: [uiPermissionsById.read.value] },
-      releases: [uiPermissionsById.read.value],
+      releases: { [ALL_RELEASES]: [uiPermissionsById.read.value] },
       userManagement: [uiPermissionsById.read.value]
     }
   },
@@ -296,7 +313,7 @@ export const rolesById = Object.freeze({
     permissions: [],
     uiPermissions: {
       ...emptyUiPermissions,
-      releases: uiPermissionsByArea.releases.uiPermissions.map(permissionMapper)
+      releases: { [ALL_RELEASES]: uiPermissionsByArea.releases.uiPermissions.map(permissionMapper) }
     }
   },
   [staticRolesByName.deploymentsManager]: {
@@ -308,7 +325,7 @@ export const rolesById = Object.freeze({
       ...emptyUiPermissions,
       deployments: uiPermissionsByArea.deployments.uiPermissions.map(permissionMapper),
       groups: { [ALL_DEVICES]: [uiPermissionsById.deploy.value] },
-      releases: [uiPermissionsById.read.value]
+      releases: { [ALL_RELEASES]: [uiPermissionsById.read.value] }
     }
   },
   [staticRolesByName.terminalAccess]: {

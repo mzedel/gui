@@ -1,3 +1,16 @@
+// Copyright 2016 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -13,7 +26,7 @@ import VeryMuch from '../../../assets/img/verymuch.svg';
 import { setSnackbar } from '../../actions/appActions';
 import { loginUser, logoutUser } from '../../actions/userActions';
 import { getToken } from '../../auth';
-import { TIMEOUTS, locations, noExpiryKey } from '../../constants/appConstants';
+import { TIMEOUTS, locations } from '../../constants/appConstants';
 import { useradmApiUrl } from '../../constants/userConstants';
 import { getCurrentUser } from '../../selectors';
 import { clearAllRetryTimers } from '../../utils/retrytimer';
@@ -59,12 +72,13 @@ const useStyles = makeStyles()(theme => {
       padding: '40px 65px',
       borderTopLeftRadius: backgroundRadius,
       borderBottomRightRadius: backgroundRadius,
-      marginBottom: 30,
+      marginBottom: 60,
       marginTop: 30,
-      transform: `skew(0, -${skew}deg)`
+      transform: `skew(0, -${skew}deg)`,
+      zIndex: 1
     },
     link: { marginLeft: theme.spacing(-0.5) },
-    ntBranding: { bottom: `calc(${theme.mixins.toolbar.minHeight}px + 3vh)`, right: 0 },
+    ntBranding: { bottom: `calc(${theme.mixins.toolbar.minHeight}px + 3vh)`, right: 0, zIndex: 0 },
     tfaNote: { maxWidth: 300 }
   };
 });
@@ -75,7 +89,7 @@ const entryText = {
 };
 
 export const EntryLink = ({ className = '', target = 'signup' }) => (
-  <div className={`margin-top flexbox centered ${className}`}>
+  <div className={`margin-top margin-bottom flexbox centered ${className}`}>
     <div className="muted margin-right">{entryText[target].question}</div>
     <Link className="flexbox center-aligned" to={entryText[target].target}>
       {entryText[target].linkText} <ChevronRight fontSize="small" />
@@ -135,7 +149,6 @@ export const Login = ({ currentUser, isHosted, loginUser, logoutUser, setSnackba
       setSnackbar(loginError, TIMEOUTS.refreshDefault);
       cookies.remove('error');
     }
-    window.localStorage.removeItem(noExpiryKey);
     return () => {
       setSnackbar('');
     };
@@ -150,8 +163,7 @@ export const Login = ({ currentUser, isHosted, loginUser, logoutUser, setSnackba
   const onLoginClick = useCallback(
     loginData => {
       // set no expiry in localstorage to remember checkbox value and avoid any influence of expiration time that might occur with cookies
-      window.localStorage.setItem(noExpiryKey, `${noExpiry}`);
-      loginUser(loginData).catch(err => {
+      loginUser(loginData, noExpiry).catch(err => {
         // don't reset the state once it was set - thus not setting `has2FA` solely based on the existence of 2fa in the error
         if (err?.error?.includes('2fa')) {
           setHas2FA(true);

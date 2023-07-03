@@ -1,3 +1,16 @@
+// Copyright 2020 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import jwtDecode from 'jwt-decode';
 import hashString from 'md5';
 import Cookies from 'universal-cookie';
@@ -34,9 +47,12 @@ export const cancelRequest = (tenantId, reason) => dispatch =>
     Promise.resolve(dispatch(setSnackbar('Deactivation request was sent successfully', TIMEOUTS.fiveSeconds, '')))
   );
 
+const devLocations = ['localhost', 'docker.mender.io'];
 export const createOrganizationTrial = data => dispatch => {
   const { location } = locations[data.location];
-  const targetLocation = `https://${window.location.hostname.startsWith('staging') ? 'staging.' : ''}${location}`;
+  const targetLocation = devLocations.includes(window.location.hostname)
+    ? ''
+    : `https://${window.location.hostname.startsWith('staging') ? 'staging.' : ''}${location}`;
   const target = `${targetLocation}${tenantadmApiUrlv2}/tenants/trial`;
   return Api.postUnauthorized(target, data)
     .catch(err => {
@@ -164,11 +180,12 @@ export const setAuditlogsState = selectionState => (dispatch, getState) => {
   Tenant management + Hosted Mender
 */
 export const tenantDataDivergedMessage = 'The system detected there is a change in your plan or purchased add-ons. Please log out and log in again';
-export const getUserOrganization = () => dispatch =>
-  Api.get(`${tenantadmApiUrlv1}/user/tenant`).then(res => {
+export const getUserOrganization = () => dispatch => {
+  const token = getToken();
+  return Api.get(`${tenantadmApiUrlv1}/user/tenant`).then(res => {
     let tasks = [dispatch({ type: SET_ORGANIZATION, organization: res.data })];
     const { addons, plan, trial } = res.data;
-    const jwt = jwtDecode(getToken());
+    const jwt = jwtDecode(token);
     const jwtData = { addons: jwt['mender.addons'], plan: jwt['mender.plan'], trial: jwt['mender.trial'] };
     if (!deepCompare({ addons, plan, trial }, jwtData)) {
       const hash = hashString(tenantDataDivergedMessage);
@@ -177,6 +194,7 @@ export const getUserOrganization = () => dispatch =>
     }
     return Promise.all(tasks);
   });
+};
 
 export const sendSupportMessage = content => dispatch =>
   Api.post(`${tenantadmApiUrlv2}/contact/support`, content)

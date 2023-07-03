@@ -1,10 +1,25 @@
+// Copyright 2020 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import React, { useEffect, useState } from 'react';
 
 import { Tooltip } from '@mui/material';
 
 import moment from 'moment';
+import pluralize from 'pluralize';
 
-const defaultTimeFormat = 'YYYY-MM-DD HH:mm';
+const defaultDateFormat = 'YYYY-MM-DD';
+const defaultTimeFormat = `${defaultDateFormat} HH:mm`;
 
 // based on react-time - https://github.com/andreypopp/react-time - which unfortunately is no longer maintained
 
@@ -54,6 +69,27 @@ export const RelativeTime = ({ className, shouldCount = 'both', updateTime }) =>
       <span>{timeDisplay}</span>
     </Tooltip>
   );
+};
+
+const cutoffDays = 14;
+export const ApproximateRelativeDate = ({ className, updateTime }) => {
+  const [updatedTime, setUpdatedTime] = useState();
+
+  useEffect(() => {
+    if (updateTime !== updatedTime) {
+      setUpdatedTime(moment(updateTime, defaultDateFormat));
+    }
+  }, [updateTime]);
+
+  const diff = updatedTime ? Math.abs(updatedTime.diff(moment(), 'days')) : 0;
+  if (updatedTime && diff <= cutoffDays) {
+    return (
+      <time className={className} dateTime={updatedTime.format(defaultDateFormat)}>
+        {diff !== 0 ? `${diff} ${pluralize('day', diff)} ago` : 'today'}
+      </time>
+    );
+  }
+  return <MaybeTime className={className} value={updatedTime} format={defaultDateFormat} titleFormat={defaultDateFormat} />;
 };
 
 export default Time;

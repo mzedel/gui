@@ -1,5 +1,19 @@
+// Copyright 2015 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { connect } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 // material ui
 import { Autorenew as AutorenewIcon, Delete as DeleteIcon, FilterList as FilterListIcon, LockOutlined } from '@mui/icons-material';
@@ -66,6 +80,9 @@ const useStyles = makeStyles()(theme => ({
     [`.filter-list > .MuiChip-root`]: {
       marginBottom: theme.spacing()
     },
+    [`.filter-list > .MuiChip-root > .MuiChip-label`]: {
+      whiteSpace: 'normal'
+    },
     ['&.filter-header']: {
       overflow: 'hidden',
       zIndex: 2
@@ -116,6 +133,34 @@ const calculateColumnSelectionSize = (changedColumns, customColumnSizes) =>
     },
     { columnSizes: [], selectedAttributes: [] }
   );
+
+const OnboardingComponent = ({ authorizeRef, deviceListRef, onboardingState, selectedRows }) => {
+  let onboardingComponent = null;
+  if (deviceListRef.current) {
+    const element = deviceListRef.current.querySelector('body .deviceListItem > div');
+    const anchor = { left: 200, top: element ? element.offsetTop + element.offsetHeight : 170 };
+    onboardingComponent = getOnboardingComponentFor(onboardingSteps.DEVICES_ACCEPTED_ONBOARDING, onboardingState, { anchor }, onboardingComponent);
+    onboardingComponent = getOnboardingComponentFor(onboardingSteps.DEPLOYMENTS_PAST_COMPLETED, onboardingState, { anchor }, onboardingComponent);
+    onboardingComponent = getOnboardingComponentFor(onboardingSteps.DEVICES_PENDING_ONBOARDING, onboardingState, { anchor }, onboardingComponent);
+  }
+  if (selectedRows && authorizeRef.current) {
+    const anchor = {
+      left: authorizeRef.current.offsetLeft - authorizeRef.current.offsetWidth,
+      top:
+        authorizeRef.current.offsetTop +
+        authorizeRef.current.offsetHeight -
+        authorizeRef.current.lastElementChild.offsetHeight +
+        authorizeRef.current.lastElementChild.firstElementChild.offsetHeight * 1.5
+    };
+    onboardingComponent = getOnboardingComponentFor(
+      onboardingSteps.DEVICES_PENDING_ACCEPTING_ONBOARDING,
+      onboardingState,
+      { place: 'left', anchor },
+      onboardingComponent
+    );
+  }
+  return onboardingComponent;
+};
 
 export const Authorized = props => {
   const {
@@ -181,6 +226,7 @@ export const Authorized = props => {
   const deviceListRef = useRef();
   const authorizeRef = useRef();
   const timer = useRef();
+  const navigate = useNavigate();
 
   // eslint-disable-next-line no-unused-vars
   const size = useWindowSize();
@@ -262,11 +308,6 @@ export const Authorized = props => {
    * Devices
    */
   const devicesToIds = devices => devices.map(device => device.id);
-
-  const onAddDevicesToGroup = devices => {
-    const deviceIds = devicesToIds(devices);
-    addDevicesToGroup(deviceIds);
-  };
 
   const onRemoveDevicesFromGroup = devices => {
     const deviceIds = devicesToIds(devices);
@@ -360,33 +401,19 @@ export const Authorized = props => {
     }
   };
 
-  let onboardingComponent;
-  const devicePendingTip = getOnboardingComponentFor(onboardingSteps.DEVICES_PENDING_ONBOARDING_START, onboardingState);
-  if (deviceListRef.current) {
-    const element = deviceListRef.current.querySelector('body .deviceListItem > div');
-    const anchor = { left: 200, top: element ? element.offsetTop + element.offsetHeight : 170 };
-    onboardingComponent = getOnboardingComponentFor(onboardingSteps.DEVICES_ACCEPTED_ONBOARDING, onboardingState, { anchor }, onboardingComponent);
-    onboardingComponent = getOnboardingComponentFor(onboardingSteps.DEPLOYMENTS_PAST_COMPLETED, onboardingState, { anchor }, onboardingComponent);
-    onboardingComponent = getOnboardingComponentFor(onboardingSteps.DEVICES_PENDING_ONBOARDING, onboardingState, { anchor }, onboardingComponent);
-  }
-  if (selectedRows && authorizeRef.current) {
-    const anchor = {
-      left: authorizeRef.current.offsetLeft - authorizeRef.current.offsetWidth,
-      top:
-        authorizeRef.current.offsetTop +
-        authorizeRef.current.offsetHeight -
-        authorizeRef.current.lastElementChild.offsetHeight +
-        authorizeRef.current.lastElementChild.firstElementChild.offsetHeight * 1.5
-    };
-    onboardingComponent = getOnboardingComponentFor(
-      onboardingSteps.DEVICES_PENDING_ACCEPTING_ONBOARDING,
-      onboardingState,
-      { place: 'left', anchor },
-      onboardingComponent
-    );
-  }
+  const onCreateDeploymentClick = devices => navigate(`/deployments?open=true&${devices.map(({ id }) => `deviceId=${id}`).join('&')}`);
+
+  const actionCallbacks = {
+    onAddDevicesToGroup: addDevicesToGroup,
+    onAuthorizationChange,
+    onCreateDeployment: onCreateDeploymentClick,
+    onDeviceDismiss,
+    onPromoteGateway: onMakeGatewayClick,
+    onRemoveDevicesFromGroup
+  };
 
   const listOptionHandlers = [{ key: 'customize', title: 'Customize', onClick: onToggleCustomizationClick }];
+  const devicePendingTip = getOnboardingComponentFor(onboardingSteps.DEVICES_PENDING_ONBOARDING_START, onboardingState);
 
   const EmptyState = currentSelectedState.emptyState;
 
@@ -484,21 +511,19 @@ export const Authorized = props => {
         <div />
       )}
       <ExpandedDevice
+        actionCallbacks={actionCallbacks}
         deviceId={openedDevice}
-        onAddDevicesToGroup={onAddDevicesToGroup}
-        onAuthorizationChange={onAuthorizationChange}
         onClose={() => setDeviceListState({ selectedId: undefined })}
-        onDeviceDismiss={onDeviceDismiss}
-        onMakeGatewayClick={onMakeGatewayClick}
-        onRemoveDevicesFromGroup={onRemoveDevicesFromGroup}
         refreshDevices={refreshDevices}
         setDetailsTab={setDetailsTab}
         tabSelection={tabSelection}
       />
-      {!selectedId && onboardingComponent ? onboardingComponent : null}
+      {!selectedId && (
+        <OnboardingComponent authorizeRef={authorizeRef} deviceListRef={deviceListRef} onboardingState={onboardingState} selectedRows={selectedRows} />
+      )}
       {canManageDevices && !!selectedRows.length && (
         <DeviceQuickActions
-          actionCallbacks={{ onAddDevicesToGroup, onAuthorizationChange, onDeviceDismiss, onRemoveDevicesFromGroup }}
+          actionCallbacks={actionCallbacks}
           devices={devices}
           features={features}
           selectedGroup={selectedStaticGroup}

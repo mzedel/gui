@@ -1,3 +1,16 @@
+// Copyright 2015 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import React, { useEffect, useRef, useState } from 'react';
 import { connect } from 'react-redux';
 
@@ -14,7 +27,7 @@ import { DEPLOYMENT_STATES, DEPLOYMENT_TYPES } from '../../constants/deploymentC
 import { ALL_DEVICES, UNGROUPED_GROUP } from '../../constants/deviceConstants';
 import { onboardingSteps } from '../../constants/onboardingConstants';
 import { getISOStringBoundaries, tryMapDeployments } from '../../helpers';
-import { getOnboardingState, getUserCapabilities } from '../../selectors';
+import { getIdAttribute, getOnboardingState, getUserCapabilities } from '../../selectors';
 import { useDebounce } from '../../utils/debouncehook';
 import { getOnboardingComponentFor } from '../../utils/onboardingmanager';
 import useWindowSize from '../../utils/resizehook';
@@ -22,11 +35,15 @@ import { clearAllRetryTimers, clearRetryTimer, setRetryTimer } from '../../utils
 import Loader from '../common/loader';
 import TimeframePicker from '../common/timeframe-picker';
 import TimerangePicker from '../common/timerange-picker';
-import { DeploymentStatus } from './deploymentitem';
+import { DeploymentSize, DeploymentStatus } from './deploymentitem';
 import { defaultRefreshDeploymentsLength as refreshDeploymentsLength } from './deployments';
 import DeploymentsList, { defaultHeaders } from './deploymentslist';
 
-const headers = [...defaultHeaders.slice(0, defaultHeaders.length - 1), { title: 'Status', renderer: DeploymentStatus }];
+const headers = [
+  ...defaultHeaders.slice(0, defaultHeaders.length - 1),
+  { title: 'Status', renderer: DeploymentStatus },
+  { title: 'Data downloaded', renderer: DeploymentSize }
+];
 
 const type = DEPLOYMENT_STATES.finished;
 
@@ -99,7 +116,9 @@ export const Past = props => {
     const pastDeploymentsFailed = past.reduce(
       (accu, item) =>
         item.status === 'failed' ||
-        (item.stats && item.stats.noartifact + item.stats.failure + item.stats['already-installed'] + item.stats.aborted > 0) ||
+        (item.statistics?.status &&
+          item.statistics.status.noartifact + item.statistics.status.failure + item.statistics.status['already-installed'] + item.statistics.status.aborted >
+            0) ||
         accu,
       false
     );
@@ -261,6 +280,7 @@ const mapStateToProps = state => {
     canConfigure,
     canDeploy,
     groups: [ALL_DEVICES, ...Object.keys(groups)],
+    idAttribute: getIdAttribute(state).attribute,
     onboardingState: getOnboardingState(state),
     past,
     pastSelectionState: state.deployments.selectionState.finished

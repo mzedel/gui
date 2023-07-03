@@ -1,3 +1,16 @@
+// Copyright 2018 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import React, { useEffect, useRef, useState } from 'react';
 import { connect } from 'react-redux';
 import { useParams } from 'react-router-dom';
@@ -12,8 +25,6 @@ import {
   addDynamicGroup,
   addStaticGroup,
   getAllDeviceCounts,
-  getDynamicGroups,
-  getGroups,
   preauthDevice,
   removeDevicesFromGroup,
   removeDynamicGroup,
@@ -27,7 +38,7 @@ import { setShowConnectingDialog } from '../../actions/userActions';
 import { SORTING_OPTIONS, TIMEOUTS } from '../../constants/appConstants';
 import { DEVICE_FILTERING_OPTIONS, DEVICE_ISSUE_OPTIONS, DEVICE_STATES, emptyFilter } from '../../constants/deviceConstants';
 import { toggle, versionCompare } from '../../helpers';
-import { getDocsVersion, getFeatures, getLimitMaxed, getTenantCapabilities, getUserCapabilities } from '../../selectors';
+import { getDocsVersion, getFeatures, getGroups as getGroupsSelector, getLimitMaxed, getTenantCapabilities, getUserCapabilities } from '../../selectors';
 import { useLocationParams } from '../../utils/liststatehook';
 import Global from '../settings/global';
 import AuthorizedDevices from './authorized-devices';
@@ -56,12 +67,10 @@ export const DeviceGroups = ({
   filteringAttributes,
   filters,
   getAllDeviceCounts,
-  getDynamicGroups,
-  getGroups,
   groupCount,
   groupFilters,
   groups,
-  groupsById,
+  groupsByType,
   hasReporting,
   limitMaxed,
   pendingCount,
@@ -100,10 +109,6 @@ export const DeviceGroups = ({
   });
 
   const { refreshTrigger, selectedId, state: selectedState } = deviceListState;
-
-  useEffect(() => {
-    refreshGroups();
-  }, [groupCount]);
 
   useEffect(() => {
     if (!deviceTimer.current) {
@@ -163,14 +168,6 @@ export const DeviceGroups = ({
   /*
    * Groups
    */
-  const refreshGroups = () => {
-    let tasks = [getGroups()];
-    if (isEnterprise) {
-      tasks.push(getDynamicGroups());
-    }
-    return Promise.all(tasks).catch(console.log);
-  };
-
   const removeCurrentGroup = () => {
     const request = groupFilters.length ? removeDynamicGroup(selectedGroup) : removeStaticGroup(selectedGroup);
     return request.then(toggleGroupRemoval).catch(console.log);
@@ -190,7 +187,6 @@ export const DeviceGroups = ({
       setCreateGroupExplanation(false);
       setModifyGroupDialog(false);
       setFromFilters(false);
-      refreshGroups();
     });
   };
 
@@ -281,7 +277,7 @@ export const DeviceGroups = ({
           className="leftFixed"
           acceptedCount={acceptedCount}
           changeGroup={onGroupSelect}
-          groups={groupsById}
+          groups={groupsByType}
           openGroupDialog={setCreateGroupExplanation}
           selectedGroup={selectedGroup}
           showHelptips={showHelptips}
@@ -340,8 +336,6 @@ const actionCreators = {
   addDynamicGroup,
   addStaticGroup,
   getAllDeviceCounts,
-  getDynamicGroups,
-  getGroups,
   preauthDevice,
   removeDevicesFromGroup,
   removeDynamicGroup,
@@ -367,6 +361,7 @@ const mapStateToProps = state => {
   const filteringAttributes = { ...state.devices.filteringAttributes, identityAttributes: [...state.devices.filteringAttributes.identityAttributes, 'id'] };
   const { canManageDevices } = getUserCapabilities(state);
   const tenantCapabilities = getTenantCapabilities(state);
+  const { groupNames, ...groupsByType } = getGroupsSelector(state);
   return {
     acceptedCount: state.devices.byStatus.accepted.total || 0,
     authRequestCount: state.monitor.issueCounts.byType[DEVICE_ISSUE_OPTIONS.authRequests.key].total,
@@ -378,8 +373,8 @@ const mapStateToProps = state => {
     features: getFeatures(state),
     filteringAttributes,
     filters: state.devices.filters || [],
-    groups: Object.keys(state.devices.groups.byId).sort(),
-    groupsById: state.devices.groups.byId,
+    groups: groupNames,
+    groupsByType,
     groupCount,
     groupFilters,
     hasReporting: state.app.features.hasReporting,

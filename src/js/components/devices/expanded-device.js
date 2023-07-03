@@ -1,3 +1,16 @@
+// Copyright 2015 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -26,7 +39,15 @@ import { saveGlobalSettings } from '../../actions/userActions';
 import { TIMEOUTS } from '../../constants/appConstants';
 import { DEVICE_STATES, EXTERNAL_PROVIDER } from '../../constants/deviceConstants';
 import { getDemoDeviceAddress, stringToBoolean } from '../../helpers';
-import { getDeviceTwinIntegrations, getDocsVersion, getFeatures, getIdAttribute, getTenantCapabilities, getUserCapabilities } from '../../selectors';
+import {
+  getDeviceTwinIntegrations,
+  getDocsVersion,
+  getFeatures,
+  getIdAttribute,
+  getTenantCapabilities,
+  getUserCapabilities,
+  getUserSettings
+} from '../../selectors';
 import Tracking from '../../tracking';
 import DeviceIdentityDisplay from '../common/deviceidentity';
 import { MenderTooltipClickable } from '../common/mendertooltip';
@@ -174,15 +195,17 @@ const tabs = [
   },
   {
     component: DeviceSystem,
-    title: () => 'Device System',
-    value: 'device-system',
+    title: () => 'System',
+    value: 'system',
     isApplicable: ({ device: { attributes = {} } }) => stringToBoolean(attributes?.mender_is_gateway ?? '')
   }
 ];
 
 export const ExpandedDevice = ({
   abortDeployment,
+  actionCallbacks,
   applyDeviceConfig,
+  columnSelection,
   decommissionDevice,
   defaultConfig,
   device,
@@ -201,12 +224,7 @@ export const ExpandedDevice = ({
   idAttribute,
   integrations,
   latestAlerts,
-  onAddDevicesToGroup,
-  onAuthorizationChange,
   onClose,
-  onDeviceDismiss,
-  onMakeGatewayClick,
-  onRemoveDevicesFromGroup,
   refreshDevices,
   resetDeviceDeployments,
   saveGlobalSettings,
@@ -246,11 +264,11 @@ export const ExpandedDevice = ({
   }, [deviceId, device.status]);
 
   useEffect(() => {
-    if (!mender_gateway_system_id) {
+    if (!(device.id && mender_gateway_system_id)) {
       return;
     }
     getGatewayDevices(device.id);
-  }, [mender_gateway_system_id]);
+  }, [device.id, mender_gateway_system_id]);
 
   const onDecommissionDevice = device_id => {
     // close dialog!
@@ -276,16 +294,6 @@ export const ExpandedDevice = ({
 
   const scrollToMonitor = () => setDetailsTab('monitor');
 
-  const onCreateDeploymentClick = () => navigate(`/deployments?open=true&deviceId=${deviceId}`);
-
-  const actionCallbacks = {
-    onAddDevicesToGroup,
-    onAuthorizationChange,
-    onDeviceDismiss,
-    onRemoveDevicesFromGroup,
-    onPromoteGateway: onMakeGatewayClick,
-    onCreateDeployment: onCreateDeploymentClick
-  };
   const selectedStaticGroup = selectedGroup && !groupFilters.length ? selectedGroup : undefined;
 
   const scrollToDeviceSystem = target => {
@@ -314,6 +322,7 @@ export const ExpandedDevice = ({
     abortDeployment,
     applyDeviceConfig,
     classes,
+    columnSelection,
     defaultConfig,
     device,
     deviceConfigDeployment,
@@ -423,8 +432,10 @@ const mapStateToProps = (state, ownProps) => {
     selectedGroup = state.devices.groups.selectedGroup;
     groupFilters = state.devices.groups.byId[selectedGroup].filters || [];
   }
+  const { columnSelection = [] } = getUserSettings(state);
   return {
     alertListState: state.monitor.alerts.alertList,
+    columnSelection,
     defaultConfig: state.users.globalSettings.defaultDeviceConfig,
     device,
     deviceConfigDeployment: state.deployments.byId[configDeploymentId] || {},

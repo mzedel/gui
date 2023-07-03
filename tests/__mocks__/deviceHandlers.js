@@ -1,3 +1,16 @@
+// Copyright 2020 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import { rest } from 'msw';
 
 import {
@@ -81,6 +94,31 @@ const deviceAttributes = [
   { name: 'group', scope: 'system', count: 1 }
 ];
 
+const searchHandler = ({ body: { page, per_page, filters } }, res, ctx) => {
+  if ([page, per_page, filters].some(item => !item)) {
+    return res(ctx.status(509));
+  }
+  const filter = filters.find(
+    filter => filter.scope === 'identity' && filter.attribute === 'status' && Object.values(DeviceConstants.DEVICE_STATES).includes(filter.value)
+  );
+  const status = filter?.value || '';
+  if (!status || filters.length > 1) {
+    if (filters.find(filter => filter.attribute === 'group' && filter.value.includes(Object.keys(defaultState.devices.groups.byId)[0]))) {
+      return res(ctx.set(headerNames.total, 2), ctx.json([inventoryDevice]));
+    }
+    if (filters.find(filter => filter.scope === 'monitor' && ['failed_last_update', 'alerts', 'auth_request'].includes(filter.attribute))) {
+      return res(ctx.set(headerNames.total, 4), ctx.json([inventoryDevice]));
+    }
+    return res(ctx.set(headerNames.total, 0), ctx.json([]));
+  }
+  let deviceList = Array.from({ length: defaultState.devices.byStatus[status].total }, (_, index) => ({
+    ...inventoryDevice,
+    attributes: [...inventoryDevice.attributes, { name: 'test-count', value: index, scope: 'system' }]
+  }));
+  deviceList = deviceList.slice((page - 1) * per_page, page * per_page);
+  return res(ctx.set(headerNames.total, defaultState.devices.byStatus[status].total), ctx.json(deviceList));
+};
+
 export const deviceHandlers = [
   rest.delete(`${deviceAuthV2}/devices/:deviceId/auth/:authId`, ({ params: { authId, deviceId } }, res, ctx) => {
     if (defaultState.devices.byId[deviceId].auth_sets.find(authSet => authSet.id === authId)) {
@@ -145,6 +183,7 @@ export const deviceHandlers = [
   rest.get(`${reportingApiUrl}/devices/attributes`, (req, res, ctx) =>
     res(ctx.json({ attributes: deviceAttributes, count: deviceAttributes.length, limit: 100 }))
   ),
+  rest.get(`${reportingApiUrl}/devices/search/attributes`, (req, res, ctx) => res(ctx.json(deviceAttributes))),
   rest.post(`${reportingApiUrl}/devices/aggregate`, (req, res, ctx) =>
     res(
       ctx.json([
@@ -190,27 +229,8 @@ export const deviceHandlers = [
     }
     return res(ctx.status(200));
   }),
-  rest.post(`${inventoryApiUrlV2}/filters/search`, ({ body: { page, per_page, filters } }, res, ctx) => {
-    if ([page, per_page, filters].some(item => !item)) {
-      return res(ctx.status(509));
-    }
-    const filter = filters.find(
-      filter => filter.scope === 'identity' && filter.attribute === 'status' && Object.values(DeviceConstants.DEVICE_STATES).includes(filter.value)
-    );
-    const status = filter?.value || '';
-    if (!status || filters.length > 1) {
-      if (filters.find(filter => filter.attribute === 'group' && filter.value.includes(Object.keys(defaultState.devices.groups.byId)[0]))) {
-        return res(ctx.set(headerNames.total, 2), ctx.json([inventoryDevice]));
-      }
-      return res(ctx.set(headerNames.total, 0), ctx.json([]));
-    }
-    let deviceList = Array.from({ length: defaultState.devices.byStatus[status].total }, (_, index) => ({
-      ...inventoryDevice,
-      attributes: [...inventoryDevice.attributes, { name: 'test-count', value: index, scope: 'system' }]
-    }));
-    deviceList = deviceList.slice((page - 1) * per_page, page * per_page);
-    return res(ctx.set(headerNames.total, defaultState.devices.byStatus[status].total), ctx.json(deviceList));
-  }),
+  rest.post(`${inventoryApiUrlV2}/filters/search`, searchHandler),
+  rest.post(`${reportingApiUrl}/filters/search`, searchHandler),
   rest.post(`${inventoryApiUrlV2}/filters`, ({ body: { name, terms } }, res, ctx) => {
     if (
       [name, terms].some(item => !item) ||

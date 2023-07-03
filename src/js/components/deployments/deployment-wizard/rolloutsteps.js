@@ -1,3 +1,16 @@
+// Copyright 2021 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import React from 'react';
 
 import { Add as AddIcon, ArrowRight as ArrowRightIcon, PauseCircleOutline as PauseIcon } from '@mui/icons-material';
@@ -40,8 +53,9 @@ const defaultSteps = {
     title: 'Install',
     tooltip: (
       <>
-        For <b>system updates</b>, this means switching the <i>inactive</i> partition on the device to be <i>active</i> next time the device reboots. This means
-        that on the next reboot the device will boot the updated software, regardless if it was rebooted by Mender, an external process or due to power loss.
+        For <b>operating system updates</b>, this means switching the <i>inactive</i> partition on the device to be <i>active</i> next time the device reboots.
+        This means that on the next reboot the device will boot the updated software, regardless if it was rebooted by Mender, an external process or due to
+        power loss.
         <br />
         For <b>application updates</b>, it depends on the Update Module but in general refers to the <i>system changing</i> effects; e.g. writing a file to its
         location, running a script, installing or starting a container.

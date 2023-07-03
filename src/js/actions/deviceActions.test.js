@@ -11,7 +11,6 @@ import { mockAbortController } from '../../../tests/setupTests';
 import { SET_SNACKBAR, UPLOAD_PROGRESS } from '../constants/appConstants';
 import * as DeploymentConstants from '../constants/deploymentConstants';
 import * as DeviceConstants from '../constants/deviceConstants';
-import { rootfsImageVersion } from '../constants/releaseConstants';
 import {
   addDevicesToGroup,
   addDynamicGroup,
@@ -22,6 +21,8 @@ import {
   deviceFileUpload,
   getAllDeviceCounts,
   getAllDevicesByStatus,
+  getAllDynamicGroupDevices,
+  getAllGroupDevices,
   getDeviceAttributes,
   getDeviceAuth,
   getDeviceById,
@@ -37,8 +38,8 @@ import {
   getGatewayDevices,
   getGroupDevices,
   getGroups,
-  getReportData,
   getReportingLimits,
+  getReportsData,
   getSessionDetails,
   getSystemDevices,
   preauthDevice,
@@ -65,6 +66,24 @@ const getGroupSuccessNotification = groupName => (
     {groupUpdateSuccessMessage} - <Link to={`/devices?inventory=group:eq:${groupName}`}>click here</Link> to see it.
   </>
 );
+
+const defaultResults = {
+  receivedDynamicGroups: {
+    type: DeviceConstants.RECEIVE_DYNAMIC_GROUPS,
+    groups: {
+      testGroupDynamic: {
+        deviceIds: [],
+        filters: [
+          { key: 'id', operator: '$in', scope: 'identity', value: ['a1'] },
+          { key: 'mac', operator: '$nexists', scope: 'identity', value: false },
+          { key: 'kernel', operator: '$exists', scope: 'identity', value: true }
+        ],
+        id: 'filter1',
+        total: 0
+      }
+    }
+  }
+};
 
 /* eslint-disable sonarjs/no-identical-functions */
 describe('selecting things', () => {
@@ -253,7 +272,10 @@ describe('overall device information retrieval', () => {
   });
 
   it('should allow getting device aggregation data for use in the dashboard/ reports', async () => {
-    const store = mockStore({ ...defaultState });
+    const store = mockStore({
+      ...defaultState,
+      devices: { ...defaultState.devices, byStatus: { ...defaultState.devices.byStatus, accepted: { ...defaultState.devices.byStatus.accepted, total: 50 } } }
+    });
     const expectedActions = [
       {
         type: DeviceConstants.SET_DEVICE_REPORTS,
@@ -263,13 +285,13 @@ describe('overall device information retrieval', () => {
               { count: 6, key: 'test' },
               { count: 1, key: 'original' }
             ],
-            otherCount: 42,
-            total: 49
+            otherCount: 43,
+            total: 50
           }
         ]
       }
     ];
-    await store.dispatch(getReportData({ attribute: 'something', group: 'somethingGroup', software: rootfsImageVersion }, 0));
+    await store.dispatch(getReportsData());
     const storeActions = store.getActions();
     expect(storeActions.length).toEqual(expectedActions.length);
     expectedActions.map((action, index) => expect(storeActions[index]).toMatchObject(action));
@@ -488,6 +510,21 @@ describe('static grouping related actions', () => {
     const groupName = 'createdTestGroup';
     const expectedActions = [
       { type: DeviceConstants.ADD_TO_GROUP, group: groupName, deviceIds: [defaultState.devices.byId.a1.id] },
+      { type: DeviceConstants.RECEIVE_GROUPS, groups: { testGroup: defaultState.devices.groups.byId.testGroup } },
+      {
+        type: DeviceConstants.RECEIVE_DEVICES,
+        devicesById: { [defaultState.devices.byId.a1.id]: { ...defaultState.devices.byId.a1, updated_ts: inventoryDevice.updated_ts } }
+      },
+      { type: DeviceConstants.RECEIVE_DEVICES, devicesById: { [defaultState.devices.byId.a1.id]: defaultState.devices.byId.a1 } },
+      {
+        type: DeviceConstants.ADD_DYNAMIC_GROUP,
+        groupName: DeviceConstants.UNGROUPED_GROUP.id,
+        group: {
+          deviceIds: [],
+          total: 0,
+          filters: [{ key: 'group', operator: '$nin', scope: 'system', value: [Object.keys(defaultState.devices.groups.byId)[0]] }]
+        }
+      },
       { type: DeviceConstants.ADD_STATIC_GROUP, group: { deviceIds: [], total: 0, filters: [] }, groupName },
       { type: DeviceConstants.SET_DEVICE_LIST_STATE, state: { ...defaultState.devices.deviceList, deviceIds: [], setOnly: true } },
       { type: SET_SNACKBAR, snackbar: { message: getGroupSuccessNotification(groupName) } },
@@ -507,7 +544,7 @@ describe('static grouping related actions', () => {
         }
       }
     ];
-    await store.dispatch(addStaticGroup(groupName, [defaultState.devices.byId.a1.id]));
+    await store.dispatch(addStaticGroup(groupName, [defaultState.devices.byId.a1]));
     const storeActions = store.getActions();
     expect(storeActions.length).toEqual(expectedActions.length);
     expectedActions.map((action, index) => expect(storeActions[index]).toMatchObject(action));
@@ -591,28 +628,26 @@ describe('static grouping related actions', () => {
     expect(devicesById[defaultState.devices.byId.a1.id]).toBeTruthy();
     expect(new Date(devicesById[defaultState.devices.byId.a1.id].updated_ts).getTime()).toBeGreaterThanOrEqual(new Date(updated_ts).getTime());
   });
+  it('should allow complete device retrieval for static groups', async () => {
+    const store = mockStore({ ...defaultState });
+    const groupName = 'testGroup';
+    // eslint-disable-next-line no-unused-vars
+    const { updated_ts, ...expectedDevice } = defaultState.devices.byId.a1;
+    const expectedActions = [
+      { type: DeviceConstants.RECEIVE_DEVICES, devicesById: { [defaultState.devices.byId.a1.id]: expectedDevice } },
+      { type: DeviceConstants.RECEIVE_GROUP_DEVICES, group: { filters: [], deviceIds: [defaultState.devices.byId.a1.id], total: 1 }, groupName }
+    ];
+    await store.dispatch(getAllGroupDevices(groupName));
+    const storeActions = store.getActions();
+    expect(storeActions.length).toEqual(expectedActions.length);
+    expectedActions.map((action, index) => expect(storeActions[index]).toMatchObject(action));
+  });
 });
 
 describe('dynamic grouping related actions', () => {
   it('should allow retrieving dynamic groups', async () => {
     const store = mockStore({ ...defaultState });
-    const expectedActions = [
-      {
-        type: DeviceConstants.RECEIVE_DYNAMIC_GROUPS,
-        groups: {
-          testGroupDynamic: {
-            deviceIds: [],
-            filters: [
-              { key: 'id', operator: '$in', scope: 'identity', value: ['a1'] },
-              { key: 'mac', operator: '$nexists', scope: 'identity', value: false },
-              { key: 'kernel', operator: '$exists', scope: 'identity', value: true }
-            ],
-            id: 'filter1',
-            total: 0
-          }
-        }
-      }
-    ];
+    const expectedActions = [defaultResults.receivedDynamicGroups];
     await store.dispatch(getDynamicGroups());
     const storeActions = store.getActions();
     expect(storeActions.length).toEqual(expectedActions.length);
@@ -628,9 +663,24 @@ describe('dynamic grouping related actions', () => {
         groupName,
         group: { deviceIds: [], total: 0, filters: [{ key: 'group', operator: '$nin', scope: 'system', value: ['testGroup'] }] }
       },
-      { type: SET_SNACKBAR, snackbar: { message: getGroupSuccessNotification(groupName) } }
+      { type: SET_SNACKBAR, snackbar: { message: getGroupSuccessNotification(groupName) } },
+      defaultResults.receivedDynamicGroups
     ];
     await store.dispatch(addDynamicGroup(groupName, [{ key: 'group', operator: '$nin', scope: 'system', value: ['testGroup'] }]));
+    const storeActions = store.getActions();
+    expect(storeActions.length).toEqual(expectedActions.length);
+    expectedActions.map((action, index) => expect(storeActions[index]).toMatchObject(action));
+  });
+  it('should allow complete device retrieval for dynamic groups', async () => {
+    const store = mockStore({ ...defaultState });
+    const groupName = 'testGroupDynamic';
+    // eslint-disable-next-line no-unused-vars
+    const { updated_ts, ...expectedDevice } = defaultState.devices.byId.a1;
+    const expectedActions = [
+      { type: DeviceConstants.RECEIVE_DEVICES, devicesById: {} },
+      { type: DeviceConstants.RECEIVE_GROUP_DEVICES, group: defaultState.devices.groups.byId.testGroupDynamic, groupName }
+    ];
+    await store.dispatch(getAllDynamicGroupDevices(groupName));
     const storeActions = store.getActions();
     expect(storeActions.length).toEqual(expectedActions.length);
     expectedActions.map((action, index) => expect(storeActions[index]).toMatchObject(action));
@@ -650,7 +700,8 @@ describe('dynamic grouping related actions', () => {
     const expectedActions = [
       { type: DeviceConstants.ADD_DYNAMIC_GROUP, groupName, group: { deviceIds: [], total: 0, filters: [] } },
       { type: DeviceConstants.SET_DEVICE_FILTERS, filters: defaultState.devices.groups.byId.testGroupDynamic.filters },
-      { type: SET_SNACKBAR, snackbar: { message: groupUpdateSuccessMessage } }
+      { type: SET_SNACKBAR, snackbar: { message: groupUpdateSuccessMessage } },
+      defaultResults.receivedDynamicGroups
     ];
     await store.dispatch(updateDynamicGroup(groupName, []));
     const storeActions = store.getActions();
@@ -838,28 +889,7 @@ describe('device config ', () => {
   });
   it('should allow single device config deployment', async () => {
     const store = mockStore({ ...defaultState });
-    const expectedActions = [
-      { type: DeploymentConstants.RECEIVE_DEPLOYMENT, deployment: { id: defaultState.deployments.byId.d1.id } },
-      {
-        type: DeploymentConstants.RECEIVE_DEPLOYMENTS,
-        deployments: {
-          [defaultState.deployments.byId.d1.id]: {
-            id: defaultState.deployments.byId.d1.id,
-            stats: {
-              'already-installed': 0,
-              decommissioned: 0,
-              downloading: 0,
-              failure: 0,
-              installing: 1,
-              noartifact: 0,
-              pending: 0,
-              rebooting: 0,
-              success: 0
-            }
-          }
-        }
-      }
-    ];
+    const expectedActions = [{ type: DeploymentConstants.RECEIVE_DEPLOYMENT, deployment: { ...defaultState.deployments.byId.d1, name: 'undefined' } }];
     await store.dispatch(applyDeviceConfig(defaultState.devices.byId.a1.id), { something: 'asdl' });
     const storeActions = store.getActions();
     expect(storeActions.length).toEqual(expectedActions.length);

@@ -1,3 +1,16 @@
+// Copyright 2020 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -6,7 +19,7 @@ import pluralize from 'pluralize';
 import preauthImage from '../../../assets/img/preauthorize.png';
 import { DEVICE_STATES } from '../../constants/deviceConstants';
 import { rootfsImageVersion } from '../../constants/releaseConstants';
-import Time, { RelativeTime } from '../common/time';
+import Time, { ApproximateRelativeDate } from '../common/time';
 import DeviceStatus from './device-status';
 
 const propertyNameMap = {
@@ -60,9 +73,10 @@ export const DeviceTypes = ({ device }) => (
 
 export const RelativeDeviceTime = ({ device }) => (
   <div>
-    <RelativeTime updateTime={device.updated_ts} />
+    <ApproximateRelativeDate updateTime={device.updated_ts} />
   </div>
 );
+
 export const DeviceCreationTime = ({ device }) =>
   device.created_ts ? (
     <div>

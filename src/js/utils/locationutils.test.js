@@ -1,3 +1,16 @@
+// Copyright 2022 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import { DEPLOYMENT_ROUTES, DEPLOYMENT_STATES, listDefaultsByState } from '../constants/deploymentConstants';
 import { DEVICE_STATES, UNGROUPED_GROUP } from '../constants/deviceConstants';
 import { AUDIT_LOGS_TYPES } from '../constants/organizationConstants';
@@ -7,11 +20,14 @@ import {
   formatDeployments,
   formatDeviceSearch,
   formatPageState,
+  formatReleases,
   generateDeploymentsPath,
   generateDevicePath,
+  generateReleasesPath,
   parseAuditlogsQuery,
   parseDeploymentsQuery,
-  parseDeviceQuery
+  parseDeviceQuery,
+  parseReleasesQuery
 } from './locationutils';
 
 const today = new Date(new Date().setHours(0, 0, 0, 0)).toISOString();
@@ -88,7 +104,7 @@ describe('locationutils', () => {
       const defaultArgs = { location: { pathname: '/deployments' }, today, tonight };
       it('works as expected', () => {
         const result = parseDeploymentsQuery(new URLSearchParams('?pending=1:50&inprogress=5'), {
-          pageState: { state: DEPLOYMENT_ROUTES.active.key, id: 'testId' },
+          pageState: { state: DEPLOYMENT_ROUTES.active.key, id: ['testId'] },
           ...defaultArgs,
           location: { pathname: '/deployments/unknown' }
         });
@@ -101,7 +117,7 @@ describe('locationutils', () => {
       });
       it('works as expected - pt2', () => {
         const result = parseDeploymentsQuery(new URLSearchParams('?type=configuration&search=someSearch'), {
-          pageState: { state: DEPLOYMENT_ROUTES.finished.key, id: 'testId' },
+          pageState: { state: DEPLOYMENT_ROUTES.finished.key, id: ['testId'] },
           ...defaultArgs,
           location: { pathname: '/deployments/unknownToo' }
         });
@@ -113,7 +129,7 @@ describe('locationutils', () => {
       });
       it('works as expected - pt3', () => {
         const result = parseDeploymentsQuery(new URLSearchParams('?endDate=2020-05-02&startDate=2000-01-25'), {
-          pageState: { state: DEPLOYMENT_ROUTES.finished.key, id: 'testId' },
+          pageState: { state: DEPLOYMENT_ROUTES.finished.key, id: ['testId'] },
           ...defaultArgs,
           location: { pathname: '/deployments/done' }
         });
@@ -125,7 +141,7 @@ describe('locationutils', () => {
       });
       it('works as expected - pt4', () => {
         const result = parseDeploymentsQuery(new URLSearchParams('?perPage=60'), {
-          pageState: { state: DEPLOYMENT_ROUTES.finished.key, id: 'testId', perPage: 60 },
+          pageState: { state: DEPLOYMENT_ROUTES.finished.key, id: ['testId'], perPage: 60 },
           ...defaultArgs,
           location: { pathname: '/deployments/scheduled' }
         });
@@ -137,7 +153,7 @@ describe('locationutils', () => {
       });
       it('works with release triggered dialogs', () => {
         const result = parseDeploymentsQuery(new URLSearchParams('?release=somereleaseName'), {
-          pageState: { state: DEPLOYMENT_ROUTES.active.key, id: 'testId' },
+          pageState: { state: DEPLOYMENT_ROUTES.active.key, id: ['testId'] },
           ...defaultArgs
         });
         expect(result).toEqual({
@@ -147,7 +163,7 @@ describe('locationutils', () => {
       });
       it('works with device triggered dialogs', () => {
         const result = parseDeploymentsQuery(new URLSearchParams('?deviceId=someDevice'), {
-          pageState: { state: DEPLOYMENT_ROUTES.active.key, id: 'testId' },
+          pageState: { state: DEPLOYMENT_ROUTES.active.key, id: ['testId'] },
           ...defaultArgs
         });
         expect(result).toEqual({
@@ -222,8 +238,8 @@ describe('locationutils', () => {
         { key: 'some', operator: '$eq', scope: 'inventory', value: 'thing' }
       ]);
     });
-    it('uses working utilties - parseDeviceQuery converts new style', () => {
-      const { open } = parseDeviceQuery(new URLSearchParams(), { pageState: { id: 'something' } });
+    it('uses working utilties - parseDeviceQuery converts new style with device context', () => {
+      const { open } = parseDeviceQuery(new URLSearchParams(), { pageState: { id: ['something'] } });
       expect(open).toEqual(true);
     });
 
@@ -262,6 +278,34 @@ describe('locationutils', () => {
         selectedGroup: UNGROUPED_GROUP.id
       });
       expect(search).toEqual('inventory=some:eq:thing&inventory=group:eq:Unassigned');
+    });
+  });
+
+  describe('releases', () => {
+    it('uses working utilties - formatReleases', () => {
+      let search = formatReleases({ pageState: { tab: '', selectedTags: [] } });
+      expect(search).toEqual('');
+      search = formatReleases({ pageState: { tab: 'flump', selectedTags: ['123', '456'] } });
+      expect(search).toEqual('tag=123&tag=456&tab=flump');
+    });
+    it('uses working utilities - parseReleasesQuery', () => {
+      const result = parseReleasesQuery(new URLSearchParams('tab=flump&tag=asd&tag=52534'), {
+        location: { pathname: '/releases/terst' }
+      });
+      const endDate = new Date('2019-01-13');
+      endDate.setHours(23, 59, 59, 999);
+      expect(result).toEqual({
+        selectedRelease: 'terst',
+        tab: 'flump',
+        tags: ['asd', '52534']
+      });
+    });
+    it('uses working utilities - generateReleasesPath', () => {
+      const pageState = { tab: 'flump', selectedRelease: 'testId', selectedTags: ['123', '456'] };
+      const pathname = generateReleasesPath({ pageState });
+      const search = formatReleases({ pageState });
+      expect(pathname).toEqual('/releases/testId');
+      expect(search).toEqual('tag=123&tag=456&tab=flump');
     });
   });
 });

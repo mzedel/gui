@@ -1,3 +1,16 @@
+// Copyright 2019 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import React from 'react';
 import { createMocks } from 'react-idle-timer';
 import { MemoryRouter } from 'react-router-dom';
@@ -5,9 +18,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 import '@testing-library/jest-dom/extend-expect';
-import { cleanup, queryByRole, render, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import crypto from 'crypto';
+import { act, cleanup, queryByRole, render, within } from '@testing-library/react';
 import { setupServer } from 'msw/node';
 import { TextEncoder } from 'util';
 import { MessageChannel } from 'worker_threads';
@@ -86,11 +97,6 @@ beforeAll(async () => {
       createDataChannel: () => {}
     };
   };
-  global.crypto = {
-    subtle: {
-      digest: (_, data) => Promise.resolve(crypto.createHash('sha256').update(data))
-    }
-  };
   createMocks();
   server = setupServer(...handlers);
   await server.listen();
@@ -119,18 +125,18 @@ afterAll(async () => {
   cleanup();
 });
 
-export const selectMaterialUiSelectOption = async (element, optionText) => {
+export const selectMaterialUiSelectOption = async (element, optionText, user) => {
   // The button that opens the dropdown, which is a sibling of the input
   const selectButton = element.parentNode.querySelector('[role=button]');
   // Open the select dropdown
-  userEvent.click(selectButton);
+  await user.click(selectButton);
   // Get the dropdown element. We don't use getByRole() because it includes <select>s too.
   const listbox = document.body.querySelector('ul[role=listbox]');
   // Click the list item
   const listItem = within(listbox).getByText(optionText);
-  userEvent.click(listItem);
+  await user.click(listItem);
   // Wait for the listbox to be removed, so it isn't visible in subsequent calls
-  jest.advanceTimersByTime(150);
+  await act(async () => jest.advanceTimersByTime(150));
   expect(queryByRole(document.documentElement, 'listbox')).not.toBeInTheDocument();
   return Promise.resolve();
 };

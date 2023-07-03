@@ -1,12 +1,24 @@
+// Copyright 2020 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Clear as ClearIcon, Settings, Square } from '@mui/icons-material';
 import { IconButton, LinearProgress, linearProgressClasses, svgIconClasses } from '@mui/material';
-import { useTheme } from '@mui/styles';
 import { makeStyles } from 'tss-react/mui';
 
-import { VictoryBar, VictoryPie, VictoryStack } from 'victory';
+import { VictoryBar, VictoryContainer, VictoryPie, VictoryStack } from 'victory';
 
 import { ensureVersionString } from '../../../actions/deviceActions';
 import { chartTypes } from '../../../constants/appConstants';
@@ -38,7 +50,7 @@ const useStyles = makeStyles()(theme => ({
     display: 'grid',
     gridTemplateColumns: '200px 1fr',
     columnGap: theme.spacing(2),
-    marginBottom: 15,
+    marginBottom: theme.spacing(2),
     '&>.flexbox.column > *': {
       height: 20
     },
@@ -113,7 +125,11 @@ const BarChart = ({ data, events }) => {
   );
 };
 
-const ChartContainer = ({ className, children }) => <div className={className}>{children}</div>;
+const ChartContainer = ({ className, children, innerRef, style = {} }) => (
+  <div className={className} ref={innerRef} style={style}>
+    {children}
+  </div>
+);
 
 const BarChartContainer = ({ classes = {}, data, events, ...remainder }) => (
   <ChartContainer className={classes.wrapper}>
@@ -124,12 +140,21 @@ const BarChartContainer = ({ classes = {}, data, events, ...remainder }) => (
 
 const PieChart = props => <VictoryPie {...props} padding={{ left: 0, right: 0, top: 0, bottom: 15 }} />;
 
-const PieChartContainer = ({ classes = {}, ...chartProps }) => (
-  <ChartContainer className={classes.wrapper}>
-    <ChartLegend {...chartProps} classes={classes} />
-    <PieChart {...chartProps} />
-  </ChartContainer>
-);
+const padding = 10;
+const PieChartContainer = ({ classes = {}, ...chartProps }) => {
+  const ref = useRef();
+  let height;
+  if (ref.current) {
+    // use the widget height, remove the space the header takes up and account for widget padding (top + padding) + own padding for the chart
+    height = ref.current.parentElement.offsetHeight - ref.current.parentElement.children[0].offsetHeight - 3 * padding;
+  }
+  return (
+    <ChartContainer className={classes.wrapper} innerRef={ref} style={{ height }}>
+      <ChartLegend {...chartProps} classes={classes} />
+      {height && <PieChart {...chartProps} containerComponent={<VictoryContainer style={{ height }} />} />}
+    </ChartContainer>
+  );
+};
 
 const VictoryBarChartContainer = ({ classes = {}, ...chartProps }) => (
   <ChartContainer className={classes.wrapper}>
@@ -189,7 +214,7 @@ export const Header = ({ chartType }) => {
   );
 };
 
-export const DistributionReport = ({ data, groups, onClick, onSave, selectGroup, selection = {}, software: softwareTree }) => {
+export const DistributionReport = ({ data, getGroupDevices, groups, onClick, onSave, selection = {}, software: softwareTree }) => {
   const {
     attribute: attributeSelection,
     group: groupSelection = '',
@@ -202,13 +227,14 @@ export const DistributionReport = ({ data, groups, onClick, onSave, selectGroup,
   const [software, setSoftware] = useState('');
   const [group, setGroup] = useState('');
   const navigate = useNavigate();
-  const theme = useTheme();
+  const { classes, theme } = useStyles();
 
   useEffect(() => {
     setSoftware(softwareSelection || attributeSelection);
     setGroup(groupSelection);
     setChartType(chartTypeSelection);
     setRemoving(false);
+    getGroupDevices(groupSelection, { page: 1, perPage: 1 });
   }, [attributeSelection, groupSelection, chartTypeSelection, softwareSelection]);
 
   const { distribution, totals } = useMemo(() => {
@@ -223,11 +249,7 @@ export const DistributionReport = ({ data, groups, onClick, onSave, selectGroup,
       if (target === seriesOther) {
         return;
       }
-      const groupFilters = groups[group]?.filters?.length ? groups[group].filters : [];
-      const filter = { key: ensureVersionString(software, attributeSelection), value: target, operator: '$eq', scope: 'inventory' };
-      const filters = [...groupFilters, filter];
-      selectGroup(group, filters);
-      navigate(`/devices/accepted?${group ? `group=${group}&` : ''}${filter.key}:${filter.operator}:${target}`);
+      navigate(`/devices/accepted?inventory=${group ? `group:eq:${group}&` : ''}${ensureVersionString(software, attributeSelection)}:eq:${target}`);
     },
     [attributeSelection, group, software]
   );
@@ -245,7 +267,6 @@ export const DistributionReport = ({ data, groups, onClick, onSave, selectGroup,
   };
 
   const Chart = chartTypeComponentMap[chartType];
-  const { classes } = useStyles();
   const chartProps = {
     classes,
     data: distribution,
@@ -255,17 +276,22 @@ export const DistributionReport = ({ data, groups, onClick, onSave, selectGroup,
     style: { data: { fill: ({ datum }) => datum.fill } },
     labels: () => null
   };
-  return removing ? (
-    <RemovalWidget onCancel={toggleRemoving} onClick={onClick} />
-  ) : editing ? (
-    <ChartEditWidget
-      groups={groups}
-      onSave={onSaveClick}
-      onCancel={onToggleEditClick}
-      selection={{ ...selection, chartType, group, software }}
-      software={softwareTree}
-    />
-  ) : (
+  const couldHaveDevices = !group || groups[group]?.deviceIds.length;
+  if (removing) {
+    return <RemovalWidget onCancel={toggleRemoving} onClick={onClick} />;
+  }
+  if (editing) {
+    return (
+      <ChartEditWidget
+        groups={groups}
+        onSave={onSaveClick}
+        onCancel={onToggleEditClick}
+        selection={{ ...selection, chartType, group, software }}
+        software={softwareTree}
+      />
+    );
+  }
+  return (
     <div className="widget chart-widget">
       <div className="margin-bottom-small">
         <div className="flexbox space-between margin-bottom-small">
@@ -284,9 +310,9 @@ export const DistributionReport = ({ data, groups, onClick, onSave, selectGroup,
           <div>{group || ALL_DEVICES}</div>
         </div>
       </div>
-      {distribution.length ? (
+      {distribution.length || totals.length ? (
         <Chart {...chartProps} totals={totals} />
-      ) : groups[group]?.filters.length && !(groups[group]?.deviceIds.length || groups[group]?.total) ? (
+      ) : couldHaveDevices ? (
         <div className="muted flexbox centered">There are no devices that match the selected criteria.</div>
       ) : (
         <Loader show={true} />

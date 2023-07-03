@@ -1,22 +1,40 @@
+// Copyright 2020 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import React, { useEffect, useMemo } from 'react';
 import { connect } from 'react-redux';
 
 import { BarChart as BarChartIcon } from '@mui/icons-material';
 
-import { getDeviceAttributes, getReportData, getReportingLimits, selectGroup } from '../../actions/deviceActions';
+import {
+  defaultReportType,
+  defaultReports,
+  deriveReportsData,
+  getDeviceAttributes,
+  getGroupDevices,
+  getReportingLimits,
+  getReportsData,
+  selectGroup
+} from '../../actions/deviceActions';
 import { saveUserSettings } from '../../actions/userActions';
-import { emptyChartSelection } from '../../constants/appConstants';
 import { DEVICE_STATES, UNGROUPED_GROUP } from '../../constants/deviceConstants';
-import { softwareTitleMap } from '../../constants/releaseConstants';
+import { rootfsImageVersion, softwareTitleMap } from '../../constants/releaseConstants';
 import { isEmpty } from '../../helpers';
-import { getAttributesList, getIsEnterprise, getUserSettings } from '../../selectors';
+import { getAttributesList, getFeatures, getIsEnterprise, getUserSettings } from '../../selectors';
 import EnterpriseNotification from '../common/enterpriseNotification';
 import { extractSoftwareInformation } from '../devices/device-details/installedsoftware';
 import ChartAdditionWidget from './widgets/chart-addition';
 import DistributionReport from './widgets/distribution';
-
-const defaultReportType = 'distribution';
-export const defaultReports = [{ ...emptyChartSelection, group: null, attribute: 'artifact_name', type: defaultReportType }];
 
 const reportTypes = {
   distribution: DistributionReport
@@ -64,11 +82,14 @@ const listSoftware = attributes => {
 
 export const SoftwareDistribution = ({
   attributes,
-  getReportData,
+  deriveReportsData,
+  getReportsData,
   getDeviceAttributes,
+  getGroupDevices,
   getReportingLimits,
   groups,
   hasDevices,
+  hasReporting,
   isEnterprise,
   reports,
   reportsData,
@@ -77,23 +98,27 @@ export const SoftwareDistribution = ({
 }) => {
   useEffect(() => {
     getDeviceAttributes();
-    getReportingLimits();
+    if (hasReporting) {
+      getReportingLimits();
+    }
   }, []);
 
   useEffect(() => {
-    reports.map((report, index) => getReportData(report, index));
+    if (hasReporting) {
+      getReportsData();
+      return;
+    }
+    deriveReportsData();
   }, [JSON.stringify(reports)]);
 
   const addCurrentSelection = selection => {
     const newReports = [...reports, { ...defaultReports[0], ...selection }];
-    getReportData(selection.group, newReports.length);
     saveUserSettings({ reports: newReports });
   };
 
   const onSaveChangedReport = (change, index) => {
     let newReports = [...reports];
     newReports.splice(index, 1, change);
-    getReportData(change, index);
     saveUserSettings({ reports: newReports });
   };
 
@@ -101,7 +126,7 @@ export const SoftwareDistribution = ({
     saveUserSettings({ reports: reports.filter(report => report !== removedReport) });
   };
 
-  const software = useMemo(() => listSoftware(attributes), [JSON.stringify(attributes)]);
+  const software = useMemo(() => listSoftware(hasReporting ? attributes : [rootfsImageVersion]), [JSON.stringify(attributes), hasReporting]);
 
   if (!isEnterprise) {
     return (
@@ -111,13 +136,14 @@ export const SoftwareDistribution = ({
     );
   }
   return hasDevices ? (
-    <div className="dashboard">
+    <div className="dashboard margin-bottom-large">
       {reports.map((report, index) => {
         const Component = reportTypes[report.type || defaultReportType];
         return (
           <Component
             key={`report-${report.group}-${index}`}
             data={reportsData[index]}
+            getGroupDevices={getGroupDevices}
             groups={groups}
             onClick={() => removeReport(report)}
             onSave={change => onSaveChangedReport(change, index)}
@@ -138,8 +164,10 @@ export const SoftwareDistribution = ({
 };
 
 const actionCreators = {
+  deriveReportsData,
   getDeviceAttributes,
-  getReportData,
+  getGroupDevices,
+  getReportsData,
   getReportingLimits,
   saveUserSettings,
   selectGroup
@@ -152,10 +180,12 @@ const mapStateToProps = state => {
     (Object.keys(state.devices.byId).length ? defaultReports : []);
   // eslint-disable-next-line no-unused-vars
   const { [UNGROUPED_GROUP.id]: ungrouped, ...groups } = state.devices.groups.byId;
+  const { hasReporting } = getFeatures(state);
   return {
     attributes: getAttributesList(state),
-    hasDevices: state.devices.byStatus[DEVICE_STATES.accepted].total,
     groups,
+    hasDevices: state.devices.byStatus[DEVICE_STATES.accepted].total,
+    hasReporting,
     isEnterprise: getIsEnterprise(state),
     reports,
     reportsData: state.devices.reports

@@ -1,3 +1,16 @@
+// Copyright 2015 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import React, { useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -51,7 +64,7 @@ const useStyles = makeStyles()(theme => ({
   row: { flexWrap: 'wrap', maxWidth: '85vw' }
 }));
 
-export const Dashboard = ({ currentUser, hasReporting, onboardingState, setSnackbar }) => {
+export const Dashboard = ({ currentUser, onboardingState, setSnackbar }) => {
   const timer = useRef();
   const { classes } = useStyles();
   const navigate = useNavigate();
@@ -89,7 +102,7 @@ export const Dashboard = ({ currentUser, hasReporting, onboardingState, setSnack
         <div className={classes.board}>
           <div className={classes.left}>
             <Devices clickHandle={handleClick} />
-            {hasReporting ? <SoftwareDistribution /> : <div />}
+            <SoftwareDistribution />
           </div>
           <Deployments className={classes.right} clickHandle={handleClick} />
         </div>
@@ -107,7 +120,6 @@ const actionCreators = { setSnackbar };
 const mapStateToProps = state => {
   return {
     currentUser: state.users.currentUser,
-    hasReporting: state.app.features.hasReporting || 12,
     onboardingState: getOnboardingState(state)
   };
 };

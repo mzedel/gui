@@ -1,3 +1,16 @@
+// Copyright 2019 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import Cookies from 'universal-cookie';
 
 import GeneralApi from '../api/general-api';
@@ -16,7 +29,7 @@ import { DEPLOYMENT_STATES } from '../constants/deploymentConstants';
 import { DEVICE_STATES } from '../constants/deviceConstants';
 import { onboardingSteps } from '../constants/onboardingConstants';
 import { SET_SHOW_HELP } from '../constants/userConstants';
-import { customSort, deepCompare, extractErrorMessage, preformatWithRequestID, stringToBoolean } from '../helpers';
+import { deepCompare, extractErrorMessage, preformatWithRequestID, stringToBoolean } from '../helpers';
 import { getCurrentUser, getOfflineThresholdSettings, getUserSettings as getUserSettingsSelector } from '../selectors';
 import { getOnboardingComponentFor } from '../utils/onboardingmanager';
 import { getDeploymentsByStatus } from './deploymentActions';
@@ -48,6 +61,18 @@ export const commonErrorHandler = (err, errorContext, dispatch, fallback, mightB
 
 const getComparisonCompatibleVersion = version => (isNaN(version.charAt(0)) && version !== 'next' ? 'master' : version);
 
+const featureFlags = [
+  'hasAddons',
+  'hasAuditlogs',
+  'hasMultitenancy',
+  'hasDeltaProgress',
+  'hasDeviceConfig',
+  'hasDeviceConnect',
+  'hasReleaseTags',
+  'hasReporting',
+  'hasMonitor',
+  'isEnterprise'
+];
 export const parseEnvironmentInfo = () => (dispatch, getState) => {
   const state = getState();
   let onboardingComplete = state.onboarding.complete || !!JSON.parse(window.localStorage.getItem('onboardingComplete') ?? 'false');
@@ -82,15 +107,8 @@ export const parseEnvironmentInfo = () => (dispatch, getState) => {
       trackerCode: trackerCode || state.app.trackerCode
     };
     environmentFeatures = {
-      hasAddons: stringToBoolean(features.hasAddons),
-      hasAuditlogs: stringToBoolean(features.hasAuditlogs),
-      hasMultitenancy: stringToBoolean(features.hasMultitenancy),
-      hasDeviceConfig: stringToBoolean(features.hasDeviceConfig),
-      hasDeviceConnect: stringToBoolean(features.hasDeviceConnect),
-      hasMonitor: stringToBoolean(features.hasMonitor),
-      hasReporting: stringToBoolean(features.hasReporting),
+      ...featureFlags.reduce((accu, flag) => ({ ...accu, [flag]: stringToBoolean(features[flag]) }), {}),
       isHosted: stringToBoolean(features.isHosted) || window.location.hostname.includes('hosted.mender.io'),
-      isEnterprise: stringToBoolean(features.isEnterprise),
       isDemoMode: stringToBoolean(isDemoMode || features.isDemoMode)
     };
     versionInfo = {
@@ -112,8 +130,47 @@ export const parseEnvironmentInfo = () => (dispatch, getState) => {
     dispatch(setDemoArtifactPort(demoArtifactPort)),
     dispatch({ type: SET_FEATURES, value: environmentFeatures }),
     dispatch({ type: SET_VERSION_INFORMATION, docsVersion: versionInfo.docs, value: versionInfo.remainder }),
-    dispatch({ type: SET_ENVIRONMENT_DATA, value: environmentData })
+    dispatch({ type: SET_ENVIRONMENT_DATA, value: environmentData }),
+    dispatch(getLatestReleaseInfo())
   ]);
+};
+
+const maybeAddOnboardingTasks = ({ devicesByStatus, dispatch, showHelptips, onboardingState, tasks }) => {
+  if (!(showHelptips && onboardingState.showTips) || onboardingState.complete) {
+    return tasks;
+  }
+  const welcomeTip = getOnboardingComponentFor(onboardingSteps.ONBOARDING_START, {
+    progress: onboardingState.progress,
+    complete: onboardingState.complete,
+    showHelptips,
+    showTips: onboardingState.showTips
+  });
+  if (welcomeTip) {
+    tasks.push(dispatch(setSnackbar('open', TIMEOUTS.refreshDefault, '', welcomeTip, () => {}, true)));
+  }
+  // try to retrieve full device details for onboarding devices to ensure ips etc. are available
+  // we only load the first few/ 20 devices, as it is possible the onboarding is left dangling
+  // and a lot of devices are present and we don't want to flood the backend for this
+  return devicesByStatus[DEVICE_STATES.accepted].deviceIds.reduce((accu, id) => {
+    accu.push(dispatch(getDeviceById(id)));
+    return accu;
+  }, tasks);
+};
+
+const processUserCookie = (user, showHelptips) => {
+  const userCookie = cookies.get(user.id);
+  if (userCookie && userCookie.help !== 'undefined') {
+    const { help, ...crumbles } = userCookie;
+    // got user cookie with pre-existing value
+    showHelptips = help;
+    // store only remaining cookie values, to allow relying on stored settings from now on
+    if (!Object.keys(crumbles).length) {
+      cookies.remove(user.id);
+    } else {
+      cookies.set(user.id, crumbles);
+    }
+  }
+  return showHelptips;
 };
 
 export const initializeAppData = () => (dispatch, getState) => {
@@ -143,40 +200,12 @@ export const initializeAppData = () => (dispatch, getState) => {
   return Promise.all(tasks).then(() => {
     const state = getState();
     const user = getCurrentUser(state);
-    const userCookie = cookies.get(user.id);
     let tasks = [];
     let { columnSelection = [], showHelptips = state.users.showHelptips, trackingConsentGiven: hasTrackingEnabled } = getUserSettingsSelector(state);
     tasks.push(dispatch(setDeviceListState({ selectedAttributes: columnSelection.map(column => ({ attribute: column.key, scope: column.scope })) })));
     // checks if user id is set and if cookie for helptips exists for that user
-    if (userCookie && userCookie.help !== 'undefined') {
-      const { help, ...crumbles } = userCookie;
-      // got user cookie with pre-existing value
-      showHelptips = help;
-      // store only remaining cookie values, to allow relying on stored settings from now on
-      if (!Object.keys(crumbles).length) {
-        cookies.remove(user.id);
-      } else {
-        cookies.set(user.id, crumbles);
-      }
-    }
-    if (showHelptips && state.onboarding.showTips && !state.onboarding.complete) {
-      const welcomeTip = getOnboardingComponentFor(onboardingSteps.ONBOARDING_START, {
-        progress: state.onboarding.progress,
-        complete: state.onboarding.complete,
-        showHelptips,
-        showTips: state.onboarding.showTips
-      });
-      if (welcomeTip) {
-        tasks.push(dispatch(setSnackbar('open', TIMEOUTS.refreshDefault, '', welcomeTip, () => {}, true)));
-      }
-      // try to retrieve full device details for onboarding devices to ensure ips etc. are available
-      // we only load the first few/ 20 devices, as it is possible the onboarding is left dangling
-      // and a lot of devices are present and we don't want to flood the backend for this
-      tasks = state.devices.byStatus[DEVICE_STATES.accepted].deviceIds.reduce((accu, id) => {
-        accu.push(dispatch(getDeviceById(id)));
-        return accu;
-      }, tasks);
-    }
+    showHelptips = processUserCookie(user, showHelptips);
+    tasks = maybeAddOnboardingTasks({ devicesByStatus: state.devices.byStatus, dispatch, tasks, onboardingState: state.onboarding, showHelptips });
     tasks.push(dispatch({ type: SET_SHOW_HELP, show: showHelptips }));
     let settings = { showHelptips };
     if (cookies.get('_ga') && typeof hasTrackingEnabled === 'undefined') {
@@ -271,31 +300,35 @@ const repoKeyMap = {
   'mender-artifact': 'Mender-Artifact'
 };
 
+const deductSaasState = (latestRelease, guiTags, saasReleases) => {
+  const latestGuiTag = guiTags[0].name;
+  const latestSaasRelease = latestGuiTag.startsWith('saas-v') ? { date: latestGuiTag.split('-v')[1].replaceAll('.', '-'), tag: latestGuiTag } : saasReleases[0];
+  return latestSaasRelease.date > latestRelease.release_date ? latestSaasRelease.tag : latestRelease.release;
+};
+
 export const getLatestReleaseInfo = () => (dispatch, getState) => {
   if (!getState().app.features.isHosted) {
     return Promise.resolve();
   }
-  return GeneralApi.get('/versions.json').then(({ data }) => {
+  return Promise.all([GeneralApi.get('/versions.json'), GeneralApi.get('/tags.json')]).then(([{ data }, { data: guiTags }]) => {
     const { releases, saas } = data;
     const latestRelease = getLatestRelease(getLatestRelease(releases));
     const { latestRepos, latestVersions } = latestRelease.repos.reduce(
       (accu, item) => {
         if (repoKeyMap[item.name]) {
-          accu.latestVersions[repoKeyMap[item.name]] = item.version;
+          accu.latestVersions[repoKeyMap[item.name]] = getComparisonCompatibleVersion(item.version);
         }
-        accu.latestRepos[item.name] = item.version;
+        accu.latestRepos[item.name] = getComparisonCompatibleVersion(item.version);
         return accu;
       },
-      { latestVersions: {}, latestRepos: {} }
+      { latestVersions: { ...getState().app.versionInformation }, latestRepos: {} }
     );
-    const latestSaasRelease = saas.sort(customSort(true, 'date'))[0];
-    const info = latestSaasRelease.date > latestRelease.release_date ? latestSaasRelease.tag : latestRelease.release;
+    const info = deductSaasState(latestRelease, guiTags, saas);
     return Promise.resolve(
       dispatch({
         type: SET_VERSION_INFORMATION,
-        docsVersion: latestVersions.Integration.split('.').slice(0, 2).join('.'),
+        docsVersion: getState().app.docsVersion,
         value: {
-          ...getState().app.versionInformation,
           ...latestVersions,
           backend: info,
           GUI: info,

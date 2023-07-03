@@ -1,3 +1,16 @@
+// Copyright 2022 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
@@ -22,7 +35,6 @@ import DeviceDataCollapse from './devicedatacollapse';
 const useStyles = makeStyles()(theme => ({ container: { maxWidth: 600, marginTop: theme.spacing(), marginBottom: theme.spacing() } }));
 
 export const DeviceSystem = ({
-  customColumnSizes,
   columnSelection,
   device,
   devicesById,
@@ -73,11 +85,11 @@ export const DeviceSystem = ({
       <DeviceDataCollapse title="Mender Gateway">
         <TwoColumnData config={{ 'Server IP': deviceIp }} compact setSnackbar={setSnackbar} />
       </DeviceDataCollapse>
-      <DeviceDataCollapse className={classes.container} title="Device system for this gateway">
+      <DeviceDataCollapse className={classes.container} title="System for this gateway">
         <EnterpriseNotification isEnterprise={hasFullFiltering} benefit="see devices connected to your gateway device for easy access" />
         {systemDeviceTotal ? (
           <Devicelist
-            customColumnSizes={customColumnSizes}
+            customColumnSizes={[]}
             columnHeaders={columnHeaders}
             devices={systemDeviceIds.map(id => devicesById[id])}
             deviceListState={{ page, perPage }}
@@ -107,7 +119,7 @@ export const DeviceSystem = ({
       </DeviceDataCollapse>
       <div className="flexbox">
         <Button color="secondary" component={Link} to={`/deployments?deviceId=${device.id}&open=true`}>
-          Create deployment for this device system
+          Create deployment for this system
         </Button>
         <Button onClick={onConnectToGatewayClick}>Connect devices</Button>
       </div>
@@ -133,7 +145,6 @@ const actionCreators = { getSystemDevices, setSnackbar };
 
 const mapStateToProps = state => {
   return {
-    customColumnSizes: state.users.customColumns,
     devicesById: state.devices.byId,
     docsVersion: getDocsVersion(state),
     hasFullFiltering: getTenantCapabilities(state),

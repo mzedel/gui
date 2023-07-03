@@ -1,3 +1,16 @@
+// Copyright 2020 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 
@@ -53,6 +66,28 @@ import {
 } from './appActions';
 import { tenantDataDivergedMessage } from './organizationActions';
 
+export const attributeReducer = (accu, item) => {
+  if (item.scope === 'inventory') {
+    accu[item.name] = item.value;
+    if (item.name === 'device_type') {
+      accu[item.name] = [].concat(item.value);
+    }
+  }
+  return accu;
+};
+// eslint-disable-next-line no-unused-vars
+const { attributes, ...expectedDevice } = defaultState.devices.byId.a1;
+export const receivedInventoryDevice = {
+  ...defaultState.devices.byId.a1,
+  attributes: inventoryDevice.attributes.reduce(attributeReducer, {}),
+  identity_data: { ...defaultState.devices.byId.a1.identity_data, status: 'accepted' },
+  isOffline: true,
+  monitor: {},
+  tags: {},
+  updated_ts: inventoryDevice.updated_ts
+};
+const latestSaasReleaseTag = 'saas-v2023.05.02';
+
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
 
@@ -84,35 +119,16 @@ describe('app actions', () => {
 
   it('should try to get all required app information', async () => {
     window.localStorage.getItem.mockReturnValueOnce('false');
-    const attributeReducer = (accu, item) => {
-      if (item.scope === 'inventory') {
-        accu[item.name] = item.value;
-        if (item.name === 'device_type') {
-          accu[item.name] = [].concat(item.value);
-        }
-      }
-      return accu;
-    };
     const store = mockStore({
       ...defaultState,
       app: { ...defaultState.app, features: { ...defaultState.app.features, isHosted: true } },
       users: { ...defaultState.users, globalSettings: { ...defaultState.users.globalSettings, id_attribute: { attribute: 'mac', scope: 'identity' } } },
       releases: { ...defaultState.releases, releasesList: { ...defaultState.releases.releasesList, page: 42 } }
     });
-    // eslint-disable-next-line no-unused-vars
-    const { attributes, ...expectedDevice } = defaultState.devices.byId.a1;
-    const receivedInventoryDevice = {
-      ...defaultState.devices.byId.a1,
-      attributes: inventoryDevice.attributes.reduce(attributeReducer, {}),
-      identity_data: { ...defaultState.devices.byId.a1.identity_data, status: 'accepted' },
-      isOffline: true,
-      monitor: {},
-      tags: {},
-      updated_ts: inventoryDevice.updated_ts
-    };
+
     const expectedActions = [
       { type: SET_ONBOARDING_COMPLETE, complete: false },
-      { type: SET_DEMO_ARTIFACT_PORT, port: undefined },
+      { type: SET_DEMO_ARTIFACT_PORT, value: 85 },
       { type: SET_FEATURES, value: { ...defaultState.app.features, hasMultitenancy: true } },
       {
         type: SET_VERSION_INFORMATION,
@@ -130,6 +146,27 @@ describe('app actions', () => {
       },
       { type: SET_ENVIRONMENT_DATA, value: { hostAddress: null, hostedAnnouncement: '', recaptchaSiteKey: '', stripeAPIKey: '', trackerCode: '' } },
       { type: SET_FIRST_LOGIN_AFTER_SIGNUP, firstLoginAfterSignup: false },
+      {
+        type: SET_VERSION_INFORMATION,
+        docsVersion: '',
+        value: {
+          GUI: latestSaasReleaseTag,
+          Integration: '1.2.3',
+          'Mender-Artifact': '1.3.7',
+          'Mender-Client': '3.2.1',
+          backend: latestSaasReleaseTag,
+          latestRelease: {
+            releaseDate: '2022-02-02',
+            repos: {
+              integration: '1.2.3',
+              mender: '3.2.1',
+              'mender-artifact': '1.3.7',
+              'other-service': '1.1.0',
+              service: '3.0.0'
+            }
+          }
+        }
+      },
       { type: SET_USER_SETTINGS, settings: { ...defaultState.users.userSettings } },
       { type: SET_GLOBAL_SETTINGS, settings: { ...defaultState.users.globalSettings } },
       { type: SET_OFFLINE_THRESHOLD, value: '2019-01-12T13:00:00.900Z' },
@@ -183,6 +220,7 @@ describe('app actions', () => {
           a1: {
             ...defaultState.devices.byId.a1,
             attributes: inventoryDevice.attributes.reduce(attributeReducer, {}),
+            group: 'test',
             identity_data: { ...defaultState.devices.byId.a1.identity_data, status: 'accepted' },
             isOffline: true,
             monitor: {},
@@ -203,6 +241,7 @@ describe('app actions', () => {
           a1: {
             ...defaultState.devices.byId.a1,
             attributes: inventoryDevice.attributes.reduce(attributeReducer, {}),
+            group: 'test',
             identity_data: { ...defaultState.devices.byId.a1.identity_data, status: 'accepted' },
             isOffline: true,
             monitor: {},
@@ -225,6 +264,7 @@ describe('app actions', () => {
       {
         type: RECEIVE_DYNAMIC_GROUPS,
         groups: {
+          testGroup: defaultState.devices.groups.byId.testGroup,
           testGroupDynamic: {
             deviceIds: [],
             filters: [
@@ -237,7 +277,16 @@ describe('app actions', () => {
           }
         }
       },
-      { type: RECEIVE_GROUPS, groups: { testGroup: defaultState.devices.groups.byId.testGroup } },
+      {
+        type: RECEIVE_GROUPS,
+        groups: {
+          testGroup: defaultState.devices.groups.byId.testGroup,
+          testGroupDynamic: {
+            filters: [{ key: 'group', operator: '$eq', scope: 'system', value: 'things' }],
+            id: 'filter1'
+          }
+        }
+      },
       {
         type: RECEIVE_EXTERNAL_DEVICE_INTEGRATIONS,
         value: [
@@ -246,14 +295,10 @@ describe('app actions', () => {
         ]
       },
       { type: RECEIVE_RELEASES, releases: defaultState.releases.byId },
-      {
-        type: SET_RELEASES_LIST_STATE,
-        value: { ...defaultState.releases.releasesList, releaseIds: [defaultState.releases.byId.r1.Name], page: 42 }
-      },
       { type: SET_ONBOARDING_ARTIFACT_INCLUDED, value: true },
       {
         type: SET_RELEASES_LIST_STATE,
-        value: { ...defaultState.releases.releasesList, searchAttribute: 'name', page: 42 }
+        value: { ...defaultState.releases.releasesList, releaseIds: [defaultState.releases.byId.r1.Name], page: 42 }
       },
       { type: SET_DEVICE_LIMIT, limit: 500 },
       { type: RECEIVED_PERMISSION_SETS, value: receivedPermissionSets },
@@ -261,29 +306,18 @@ describe('app actions', () => {
       { type: SET_ORGANIZATION, organization: defaultState.organization.organization },
       { type: SET_ANNOUNCEMENT, announcement: tenantDataDivergedMessage },
       {
-        type: RECEIVE_DEPLOYMENTS,
-        deployments: {
-          [defaultState.deployments.byId.d1.id]: { ...defaultState.deployments.byId.d1, stats: { ...defaultState.deployments.byId.d1.stats } },
-          [defaultState.deployments.byId.d2.id]: { ...defaultState.deployments.byId.d2, stats: { ...defaultState.deployments.byId.d2.stats } }
-        }
-      },
-      {
-        type: RECEIVE_DEPLOYMENTS,
-        deployments: {
-          [defaultState.deployments.byId.d1.id]: { ...defaultState.deployments.byId.d1, stats: { ...defaultState.deployments.byId.d1.stats } },
-          [defaultState.deployments.byId.d2.id]: { ...defaultState.deployments.byId.d2, stats: { ...defaultState.deployments.byId.d2.stats } }
-        }
-      },
-      {
         type: RECEIVE_DEVICES,
         devicesById: { [expectedDevice.id]: { ...defaultState.devices.byId.a1, isOffline: true, monitor: {}, tags: {} } }
       },
       {
         type: RECEIVE_DEVICES,
-        devicesById: { [expectedDevice.id]: { ...defaultState.devices.byId.a1, isOffline: true, monitor: {}, tags: {} } }
+        devicesById: { [expectedDevice.id]: { ...defaultState.devices.byId.a1, group: undefined, isOffline: true, monitor: {}, tags: {} } }
       },
-      { type: RECEIVE_DEVICES, devicesById: { [expectedDevice.id]: receivedInventoryDevice } },
-      { type: RECEIVE_DEVICES, devicesById: { [expectedDevice.id]: { ...defaultState.devices.byId.a1, isOffline: true, monitor: {}, tags: {} } } },
+      { type: RECEIVE_DEVICES, devicesById: { [expectedDevice.id]: { ...receivedInventoryDevice, group: 'test' } } },
+      {
+        type: RECEIVE_DEVICES,
+        devicesById: { [expectedDevice.id]: { ...defaultState.devices.byId.a1, group: undefined, isOffline: true, monitor: {}, tags: {} } }
+      },
       {
         type: ADD_DYNAMIC_GROUP,
         groupName: UNGROUPED_GROUP.id,
@@ -305,7 +339,7 @@ describe('app actions', () => {
         }
       },
       { type: SET_SHOW_HELP, show: true },
-      { type: RECEIVE_DEVICES, devicesById: { [expectedDevice.id]: receivedInventoryDevice } },
+      { type: RECEIVE_DEVICES, devicesById: { [expectedDevice.id]: { ...receivedInventoryDevice, group: 'test' } } },
       {
         type: SET_ACCEPTED_DEVICES,
         deviceIds: [defaultState.devices.byId.a1.id, defaultState.devices.byId.a1.id],
@@ -313,7 +347,11 @@ describe('app actions', () => {
         total: defaultState.devices.byStatus.accepted.total
       },
       { type: SET_USER_SETTINGS, settings: { ...defaultState.users.userSettings } },
-      { type: RECEIVE_DEVICES, devicesById: { [expectedDevice.id]: { ...defaultState.devices.byId.a1, isOffline: true, monitor: {}, tags: {} } } },
+      { type: SET_USER_SETTINGS, settings: { ...defaultState.users.userSettings, showHelptips: true } },
+      {
+        type: RECEIVE_DEVICES,
+        devicesById: { [expectedDevice.id]: { ...defaultState.devices.byId.a1, group: undefined, isOffline: true, monitor: {}, tags: {} } }
+      },
       {
         type: SET_DEVICE_LIST_STATE,
         state: {
@@ -327,8 +365,7 @@ describe('app actions', () => {
           state: 'accepted',
           total: 2
         }
-      },
-      { type: SET_USER_SETTINGS, settings: { ...defaultState.users.userSettings, showHelptips: true } }
+      }
     ];
     await store.dispatch(initializeAppData());
     const storeActions = store.getActions();
@@ -385,7 +422,7 @@ describe('app actions', () => {
     const expectedActions = [
       {
         type: SET_VERSION_INFORMATION,
-        value: { backend: 'saas-v2022.03.10', GUI: 'saas-v2022.03.10', Integration: '1.2.3', 'Mender-Client': '3.2.1', 'Mender-Artifact': '1.3.7' }
+        value: { backend: latestSaasReleaseTag, GUI: latestSaasReleaseTag, Integration: '1.2.3', 'Mender-Client': '3.2.1', 'Mender-Artifact': '1.3.7' }
       }
     ];
     await store.dispatch(getLatestReleaseInfo());

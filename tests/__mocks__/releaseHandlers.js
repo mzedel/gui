@@ -1,3 +1,16 @@
+// Copyright 2020 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import { rest } from 'msw';
 
 import { deploymentsApiUrl } from '../../src/js/actions/deploymentActions';
@@ -31,16 +44,12 @@ export const releaseHandlers = [
     if (searchParams.get('device_type')) {
       return res(ctx.json([]));
     }
-    if (page == 42 && !searchParams.get('name')) {
+    if (page == 42) {
       return res(ctx.set(headerNames.total, 1), ctx.json([defaultState.releases.byId.r1]));
     }
     const sort = searchParams.get('sort');
-    if (sort.includes('modified:desc')) {
-      const releaseListSection = releasesList.slice(releasesList.length - 10);
-      return res(ctx.set(headerNames.total, releasesList.length), ctx.json(releaseListSection));
-    }
     const releaseListSection = releasesList.sort(customSort(sort.includes(SORTING_OPTIONS.desc), 'Name')).slice((page - 1) * perPage, page * perPage);
-    if (searchParams.get('description') || searchParams.get('name')) {
+    if (searchParams.get('name')) {
       return res(ctx.set(headerNames.total, 1234), ctx.json(releaseListSection));
     }
     return res(ctx.set(headerNames.total, releasesList.length), ctx.json(releaseListSection));

@@ -1,3 +1,16 @@
+// Copyright 2019 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import { BarChart as BarChartIcon, PieChartOutline as PieChartIcon } from '@mui/icons-material';
 
 import FlagEU from '../../assets/img/flag-eu.svg';
@@ -16,7 +29,6 @@ export const chartTypes = {
 };
 export const emptyChartSelection = { software: '', group: '', chartType: chartTypes.bar.key, attribute: 'artifact_name' };
 
-export const noExpiryKey = 'noExpiry';
 export const RECEIVED_HOSTED_LINKS = 'RECEIVED_HOSTED_LINKS';
 export const SET_ANNOUNCEMENT = 'SET_ANNOUNCEMENT';
 export const SET_ENVIRONMENT_DATA = 'SET_ENVIRONMENT_DATA';
@@ -50,7 +62,7 @@ export const PLANS = {
   os: {
     name: 'Basic',
     offer: true,
-    price: '$29/month',
+    price: '$32/month',
     deviceCount: startingDeviceCount.os,
     offerprice: '$23/month for first 50 devices',
     price2: 'for first 6 months;\n$29/month thereafter',
@@ -60,7 +72,7 @@ export const PLANS = {
   professional: {
     name: 'Professional',
     offer: true,
-    price: '$249/month',
+    price: '$269/month',
     deviceCount: startingDeviceCount.professional,
     offerprice: '$200/month for first 50 devices',
     price2: 'for first 6 months;\n$249/month thereafter',
@@ -82,38 +94,41 @@ export const ADDONS = {
     description: 'Expand your plan with device configuration features',
     needs: ['hasDeviceConfig'],
     os: {
-      price: '$10/month',
+      price: '$11/month',
       deviceCount: startingDeviceCount.os
     },
     professional: {
-      price: '$60/month',
+      price: '$65/month',
       deviceCount: startingDeviceCount.professional
-    }
+    },
+    eligible: ['os', 'professional', 'enterprise']
   },
   troubleshoot: {
     title: 'Troubleshoot',
     description: 'Expand your plan with device troubleshooting features',
     needs: ['hasDeviceConnect'],
     os: {
-      price: '$24/month',
+      price: '$27/month',
       deviceCount: startingDeviceCount.os
     },
     professional: {
-      price: '$67/month',
+      price: '$72/month',
       deviceCount: startingDeviceCount.professional
-    }
+    },
+    eligible: ['os', 'professional', 'enterprise']
   },
   monitor: {
     title: 'Monitor',
     description: 'Expand your plan with device monitoring features',
     needs: ['hasMonitor'],
     os: {
-      price: '$24/month',
-      deviceCount: startingDeviceCount.os
+      price: '-',
+      deviceCount: '-'
     },
     professional: {
-      price: '$67/month',
+      price: '$86/month',
       deviceCount: startingDeviceCount.professional
-    }
+    },
+    eligible: ['professional', 'enterprise']
   }
 };

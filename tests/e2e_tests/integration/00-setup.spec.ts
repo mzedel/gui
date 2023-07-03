@@ -1,8 +1,21 @@
+// Copyright 2021 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import { expect } from '@playwright/test';
 import * as fs from 'fs';
 
 import test from '../fixtures/fixtures';
-import { baseUrlToDomain, login, startDockerClient, stopDockerClient, tenantTokenRetrieval } from '../utils/commands';
+import { baseUrlToDomain, login, prepareCookies, startDockerClient, stopDockerClient, tenantTokenRetrieval } from '../utils/commands';
 import { selectors } from '../utils/constants';
 
 test.describe('Test setup', () => {
@@ -68,14 +81,10 @@ test.describe('Test setup', () => {
       // the following sets the UI up for easier navigation by disabling onboarding
       const domain = baseUrlToDomain(baseUrl);
       const { token, userId } = await login(username, password, baseUrl);
-      await context.addCookies([
-        { name: 'JWT', value: token, path: '/', domain },
-        { name: `${userId}-onboarded`, value: 'true', path: '/', domain },
-        { name: 'cookieconsent_status', value: 'allow', path: '/', domain }
-      ]);
+      context = await prepareCookies(context, domain, userId, token);
       const newPage = await context.newPage();
       await newPage.goto(baseUrl);
-      await newPage.evaluate(({ userId }) => localStorage.setItem(`${userId}-onboarding`, JSON.stringify({ complete: true })), { userId });
+      await page.evaluate(() => localStorage.setItem(`onboardingComplete`, 'true'));
       await newPage.waitForSelector('text=/License information/i');
       await context.storageState({ path: 'storage.json' });
     });
@@ -87,11 +96,7 @@ test.describe('Test setup', () => {
       console.log(`logging in user with username: ${username} and password: ${password}`);
       const { token: JWT, userId } = await login(username, password, baseUrl);
       const domain = baseUrlToDomain(baseUrl);
-      await context.addCookies([
-        { name: 'JWT', value: JWT, path: '/', domain },
-        { name: `${userId}-onboarded`, value: 'true', path: '/', domain },
-        { name: 'cookieconsent_status', value: 'allow', path: '/', domain }
-      ]);
+      context = await prepareCookies(context, domain, userId, JWT);
       const page = await context.newPage();
       await page.goto(`${baseUrl}ui/settings`);
       const isVisible = await page.isVisible(`text=/Change email/i`);

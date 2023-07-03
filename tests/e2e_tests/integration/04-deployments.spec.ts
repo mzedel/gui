@@ -1,3 +1,16 @@
+// Copyright 2021 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween.js';
 
@@ -18,8 +31,9 @@ test.describe('Deployments', () => {
 
   test('allows shortcut deployments', async ({ loggedInPage: page }) => {
     // create an artifact to download first
-    await page.click(`.repository-list-item:has-text('mender-demo-artifact')`);
-    await page.click(`a:has-text('Create deployment')`);
+    await page.click(`text=/mender-demo-artifact/i`);
+    await page.hover('.MuiSpeedDial-fab');
+    await page.click('[aria-label="deploy"]');
     await page.waitForSelector(selectors.deviceGroupSelect, { timeout: 5000 });
     await page.focus(selectors.deviceGroupSelect);
     await page.type(selectors.deviceGroupSelect, 'All');

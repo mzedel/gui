@@ -1,3 +1,16 @@
+// Copyright 2020 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import React from 'react';
 
 import { render, screen } from '@testing-library/react';
@@ -18,20 +31,21 @@ describe('CancelRequestDialog Component', () => {
   });
 
   it('works as intended', async () => {
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
     const submitMock = jest.fn();
     render(<CancelRequestDialog onCancel={jest.fn} onSubmit={submitMock} />);
     expect(screen.getByRole('button', { name: /Continue/i })).toBeDisabled();
-    userEvent.click(screen.getByRole('radio', { name: /My project is delayed/i }));
+    await user.click(screen.getByRole('radio', { name: /My project is delayed/i }));
     expect(screen.getByRole('button', { name: /Continue/i })).not.toBeDisabled();
-    userEvent.click(screen.getByRole('radio', { name: /other/i }));
+    await user.click(screen.getByRole('radio', { name: /other/i }));
     expect(screen.getByRole('button', { name: /Continue/i })).toBeDisabled();
-    userEvent.type(screen.getByPlaceholderText(/reason/i), 'test reason');
+    await user.type(screen.getByPlaceholderText(/reason/i), 'test reason');
     expect(screen.getByRole('button', { name: /Continue/i })).not.toBeDisabled();
-    userEvent.type(screen.getByPlaceholderText(/suggestions/i), 'test suggestion');
-    userEvent.click(screen.getByRole('button', { name: /Continue/i }));
+    await user.type(screen.getByPlaceholderText(/suggestions/i), 'test suggestion');
+    await user.click(screen.getByRole('button', { name: /Continue/i }));
 
     expect(screen.queryByText(/thank you/i)).toBeInTheDocument();
-    userEvent.click(screen.getByRole('button', { name: /Confirm/i }));
+    await user.click(screen.getByRole('button', { name: /Confirm/i }));
 
     expect(submitMock).toHaveBeenCalledWith(`test reason\ntest suggestion`);
   });

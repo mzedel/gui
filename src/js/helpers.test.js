@@ -1,3 +1,16 @@
+// Copyright 2019 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import React from 'react';
 
 import Cookies from 'universal-cookie';
@@ -391,8 +404,8 @@ describe('fullyDecodeURI function', () => {
 });
 describe('getDemoDeviceAddress function', () => {
   it('works as expected', async () => {
-    expect(getDemoDeviceAddress(Object.values(defaultState.devices.byId), 'virtual', 85)).toEqual('http://localhost:85');
-    expect(getDemoDeviceAddress(Object.values(defaultState.devices.byId), 'physical', 85)).toEqual('http://192.168.10.141:85');
+    expect(getDemoDeviceAddress(Object.values(defaultState.devices.byId), 'virtual')).toEqual('localhost');
+    expect(getDemoDeviceAddress(Object.values(defaultState.devices.byId), 'physical')).toEqual('192.168.10.141');
   });
 });
 describe('preformatWithRequestID function', () => {
@@ -548,18 +561,20 @@ describe('tryMapDeployments function', () => {
 describe('deployment stats grouping functions', () => {
   it('groups correctly based on deployment stats', async () => {
     let deployment = {
-      stats: {
-        aborted: 2,
-        'already-installed': 1,
-        decommissioned: 1,
-        downloading: 3,
-        failure: 1,
-        installing: 1,
-        noartifact: 1,
-        pending: 2,
-        paused: 0,
-        rebooting: 1,
-        success: 1
+      statistics: {
+        status: {
+          aborted: 2,
+          'already-installed': 1,
+          decommissioned: 1,
+          downloading: 3,
+          failure: 1,
+          installing: 1,
+          noartifact: 1,
+          pending: 2,
+          paused: 0,
+          rebooting: 1,
+          success: 1
+        }
       }
     };
     expect(groupDeploymentStats(deployment)).toEqual({ inprogress: 5, paused: 0, pending: 2, successes: 3, failures: 4 });

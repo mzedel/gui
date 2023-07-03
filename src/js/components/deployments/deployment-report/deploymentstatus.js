@@ -1,3 +1,16 @@
+// Copyright 2021 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import React from 'react';
 
 import { Pause as PauseIcon, ArrowDropDownCircleOutlined as ScrollDownIcon } from '@mui/icons-material';
@@ -35,7 +48,8 @@ export const DeploymentPhaseNotification = ({ className = '', deployment = {}, o
 
 export const DeploymentStatus = ({ className = '', deployment = {} }) => {
   const { classes } = useStyles();
-  const { finished, max_devices, retries = 1, status = 'pending', stats } = deployment;
+  const { finished, max_devices, retries = 1, status = 'pending', statistics = {} } = deployment;
+  const { status: stats = {} } = statistics;
   const phaseStats = groupDeploymentStats(deployment, true);
 
   let statusDescription = (

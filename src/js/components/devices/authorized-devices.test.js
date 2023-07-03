@@ -1,3 +1,16 @@
+// Copyright 2019 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import React from 'react';
 import { Provider } from 'react-redux';
 
@@ -8,6 +21,7 @@ import thunk from 'redux-thunk';
 
 import { adminUserCapabilities, defaultState, undefineds } from '../../../../tests/mockData';
 import { render } from '../../../../tests/setupTests';
+import { DEVICE_STATES } from '../../constants/deviceConstants';
 import Authorized, { Authorized as AuthorizedDevices } from './authorized-devices';
 import { routes } from './base-devices';
 
@@ -43,6 +57,7 @@ describe('AuthorizedDevices Component', () => {
   });
 
   it('behaves as expected', async () => {
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
     const submitMock = jest.fn();
     const setUserSettingsMock = jest.fn();
     const setListStateMock = jest.fn().mockResolvedValue();
@@ -54,7 +69,7 @@ describe('AuthorizedDevices Component', () => {
     };
     const devices = defaultState.devices.byStatus.accepted.deviceIds.map(id => defaultState.devices.byId[id]);
     const pageTotal = devices.length;
-    const deviceListState = { isLoading: false, selectedState: 'accepted', selection: [], sort: {} };
+    const deviceListState = { isLoading: false, selectedState: DEVICE_STATES.accepted, selection: [], sort: {} };
     store = mockStore({ ...defaultState });
     let ui = (
       <Provider store={store}>
@@ -99,25 +114,26 @@ describe('AuthorizedDevices Component', () => {
       </Provider>
     );
     const { rerender } = render(ui);
-    act(() => userEvent.click(screen.getAllByRole('checkbox')[0]));
+    await user.click(screen.getAllByRole('checkbox')[0]);
     expect(setListStateMock).toHaveBeenCalledWith({ selection: [0, 1], setOnly: true });
-    act(() => userEvent.click(screen.getByRole('button', { name: /all/i })));
-    act(() => userEvent.click(screen.getByRole('option', { name: /devices with issues/i })));
-    act(() => Promise.resolve(userEvent.keyboard('{esc}')));
+    await user.click(screen.getByRole('button', { name: /all/i }));
+    await user.click(screen.getByRole('option', { name: /devices with issues/i }));
+    await user.keyboard('{Escape}');
     expect(setListStateMock).toHaveBeenCalledWith({ page: 1, refreshTrigger: true, selectedIssues: ['offline'] });
-    act(() => userEvent.click(screen.getByRole('button', { name: /table options/i })));
     await waitFor(() => rerender(ui));
-    act(() => userEvent.click(screen.getByRole('menuitem', { name: /customize/i })));
+    await user.click(screen.getByRole('button', { name: /table options/i }));
+    await waitFor(() => rerender(ui));
+    await user.click(screen.getByRole('menuitem', { name: /customize/i }));
     await waitFor(() => rerender(ui));
     expect(screen.getByText(/Customize Columns/i)).toBeVisible();
     const attributeSelect = screen.getByLabelText(/add a column/i);
-    act(() => userEvent.paste(attributeSelect, testKey));
-    act(() => userEvent.type(attributeSelect, '{enter}'));
-    jest.advanceTimersByTime(5000);
+    await user.type(attributeSelect, testKey);
+    await user.keyboard('{Enter}');
+    act(() => jest.advanceTimersByTime(5000));
     await waitFor(() => expect(screen.getByLabelText(/add a column/i)).toBeVisible());
     const button = screen.getByRole('button', { name: /Save/i });
     expect(button).not.toBeDisabled();
-    act(() => userEvent.click(button));
+    await user.click(button);
 
     expect(submitMock).toHaveBeenCalledWith([
       { attribute: { name: attributeNames.deviceType, scope: 'inventory' }, size: 150 },

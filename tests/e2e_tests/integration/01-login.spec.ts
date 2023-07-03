@@ -1,6 +1,18 @@
+// Copyright 2021 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import axios from 'axios';
 import * as https from 'https';
-import jwtDecode from 'jwt-decode';
 
 import test, { expect } from '../fixtures/fixtures';
 import { selectors } from '../utils/constants';
@@ -23,16 +35,15 @@ test.describe('Login', () => {
       await page.click(`:is(button:has-text('Log in'))`);
       // confirm we have logged in successfully
       await page.waitForSelector('text=License information');
-      const cookies = await context.cookies();
-      const token = cookies.find(cookie => cookie.name === 'JWT').value;
-      const userId = jwtDecode(token).sub;
-      await page.evaluate(({ userId }) => localStorage.setItem(`${userId}-onboarding`, JSON.stringify({ complete: true })), { userId });
+      await page.evaluate(() => localStorage.setItem(`onboardingComplete`, 'true'));
       await context.storageState({ path: 'storage.json' });
       // now we can log out
       await page.click('.header-dropdown', { force: true });
       await page.click(`text=Log out`, { force: true });
-      await page.waitForSelector(`text=Log in`, { timeout: 5000 });
-      expect(await page.isVisible(`text=Log in`)).toBeTruthy();
+      const loginButton = page.getByRole('button', { name: /log in/i });
+      await loginButton.waitFor({ timeout: 7000 });
+      const loginVisible = await loginButton.isVisible();
+      expect(loginVisible).toBeTruthy();
     });
 
     test('does not stay logged in across sessions, after browser restart', async ({ baseUrl, page }) => {

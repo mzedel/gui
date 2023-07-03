@@ -1,3 +1,16 @@
+// Copyright 2020 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import { rest } from 'msw';
 
 import { iotManagerBaseURL } from '../../src/js/actions/deviceActions';
@@ -62,16 +75,22 @@ const releasesSample = {
   ]
 };
 
+const tagsSample = [{ name: 'saas-v2023.05.02', more: 'here' }];
+
+const signupHandler = ({ body: signup }, res, ctx) => {
+  if (['email', 'organization', 'plan', 'tos'].every(item => !!signup[item])) {
+    return res(ctx.text('test'), ctx.cookie('JWT', 'test'));
+  }
+  return res(ctx.status(400));
+};
+
 export const organizationHandlers = [
+  rest.get('/tags.json', (req, res, ctx) => res(ctx.json(tagsSample))),
   rest.get('/versions.json', (req, res, ctx) => res(ctx.json(releasesSample))),
   rest.get(`${tenantadmApiUrlv1}/user/tenant`, (req, res, ctx) => res(ctx.json(defaultState.organization.organization))),
   rest.post(`${tenantadmApiUrlv2}/tenants/:tenantId/cancel`, (req, res, ctx) => res(ctx.status(200))),
-  rest.post(`https://hosted.mender.io${tenantadmApiUrlv2}/tenants/trial`, ({ body: signup }, res, ctx) => {
-    if (['email', 'organization', 'plan', 'tos'].every(item => !!signup[item])) {
-      return res(ctx.text('test'), ctx.cookie('JWT', 'test'));
-    }
-    return res(ctx.status(400));
-  }),
+  rest.post(`${tenantadmApiUrlv2}/tenants/trial`, signupHandler),
+  rest.post(`https://hosted.mender.io${tenantadmApiUrlv2}/tenants/trial`, signupHandler),
   rest.get(`${tenantadmApiUrlv2}/billing`, (req, res, ctx) => res(ctx.json({ card: { last4: '7890', exp_month: 1, exp_year: 2024, brand: 'testCorp' } }))),
   rest.post(`${tenantadmApiUrlv2}/billing/card`, (req, res, ctx) => res(ctx.json({ intent_id: defaultState.organization.intentId, secret: 'testSecret' }))),
   rest.post(`${tenantadmApiUrlv2}/billing/card/:intentId/confirm`, ({ params: { intentId } }, res, ctx) => {

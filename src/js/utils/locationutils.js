@@ -1,3 +1,16 @@
+// Copyright 2022 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import { routes } from '../components/devices/base-devices';
 import { DEPLOYMENT_ROUTES, DEPLOYMENT_STATES, DEPLOYMENT_TYPES } from '../constants/deploymentConstants';
 import { ATTRIBUTE_SCOPES, DEVICE_FILTERING_OPTIONS, DEVICE_LIST_DEFAULTS, UNGROUPED_GROUP, emptyFilter } from '../constants/deviceConstants';
@@ -108,7 +121,7 @@ const scopedFilterParse = searchParams => {
 export const parseDeviceQuery = (searchParams, extraProps = {}) => {
   let queryParams = new URLSearchParams(searchParams);
   const { filteringAttributes = {}, pageState = {} } = extraProps;
-  const pageStateExtension = pageState.id ? { open: true } : {};
+  const pageStateExtension = pageState.id?.length === 1 ? { open: true } : {};
 
   let scopedFilters;
   const refersOldStyleAttributes = Object.values(filteringAttributes).some(scopeValues => scopeValues.some(scopedValue => queryParams.get(scopedValue)));
@@ -371,4 +384,20 @@ export const parseDeploymentsQuery = (params, { pageState, location, today, toni
 export const generateDeploymentsPath = ({ pageState }) => {
   const { state: selectedState = DEPLOYMENT_ROUTES.active.key } = pageState.general;
   return `/deployments/${selectedState}`;
+};
+
+const releasesRoot = '/releases';
+export const formatReleases = ({ pageState: { selectedTags = [], tab } }) => {
+  const formattedFilters = selectedTags.map(tag => `tag=${tag}`);
+  if (tab) {
+    formattedFilters.push(`tab=${tab}`);
+  }
+  return formattedFilters.join('&');
+};
+export const generateReleasesPath = ({ pageState: { selectedRelease } }) => `${releasesRoot}${selectedRelease ? `/${selectedRelease}` : ''}`;
+
+export const parseReleasesQuery = (queryParams, extraProps) => {
+  const tab = queryParams.has('tab') ? queryParams.get('tab') : undefined;
+  const tags = queryParams.has('tag') ? queryParams.getAll('tag') : [];
+  return { selectedRelease: extraProps.location.pathname.substring(releasesRoot.length + 1), tab, tags };
 };

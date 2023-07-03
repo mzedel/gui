@@ -1,5 +1,19 @@
+// Copyright 2020 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import { SORTING_OPTIONS } from '../src/js/constants/appConstants';
 import * as DeviceConstants from '../src/js/constants/deviceConstants';
+import { ALL_RELEASES } from '../src/js/constants/releaseConstants';
 import {
   defaultPermissionSets,
   emptyRole,
@@ -126,19 +140,23 @@ export const defaultState = {
           a1: {
             attributes: {},
             id: 'a1',
+            image: { size: 123 },
             status: 'installing'
           }
         },
-        stats: {
-          downloading: 0,
-          decommissioned: 0,
-          failure: 0,
-          installing: 1,
-          noartifact: 0,
-          pending: 0,
-          rebooting: 0,
-          success: 0,
-          'already-installed': 0
+        statistics: {
+          status: {
+            downloading: 0,
+            decommissioned: 0,
+            failure: 0,
+            installing: 1,
+            noartifact: 0,
+            pending: 0,
+            rebooting: 0,
+            success: 0,
+            'already-installed': 0
+          },
+          total_size: 1234
         }
       },
       d2: {
@@ -155,16 +173,18 @@ export const defaultState = {
             status: 'pending'
           }
         },
-        stats: {
-          downloading: 0,
-          decommissioned: 0,
-          failure: 0,
-          installing: 0,
-          noartifact: 0,
-          pending: 1,
-          rebooting: 0,
-          success: 0,
-          'already-installed': 0
+        statistics: {
+          status: {
+            downloading: 0,
+            decommissioned: 0,
+            failure: 0,
+            installing: 0,
+            noartifact: 0,
+            pending: 1,
+            rebooting: 0,
+            success: 0,
+            'already-installed': 0
+          }
         }
       }
     },
@@ -334,11 +354,21 @@ export const defaultState = {
       }
     },
     issueCounts: {
-      byType: {
-        [DeviceConstants.DEVICE_ISSUE_OPTIONS.authRequests.key]: { filtered: 0, total: 0 },
-        [DeviceConstants.DEVICE_ISSUE_OPTIONS.monitoring.key]: { filtered: 3, total: 0 },
-        [DeviceConstants.DEVICE_ISSUE_OPTIONS.offline.key]: { filtered: 0, total: 0 }
-      }
+      byType: Object.values(DeviceConstants.DEVICE_ISSUE_OPTIONS).reduce(
+        (accu, { isCategory, key }) => {
+          if (isCategory) {
+            return accu;
+          }
+          const current = accu[key] ?? {};
+          accu[key] = { filtered: 0, total: 0, ...current };
+          return accu;
+        },
+        {
+          [DeviceConstants.DEVICE_ISSUE_OPTIONS.authRequests.key]: { filtered: 0, total: 0 },
+          [DeviceConstants.DEVICE_ISSUE_OPTIONS.monitoring.key]: { filtered: 3, total: 0 },
+          [DeviceConstants.DEVICE_ISSUE_OPTIONS.offline.key]: { filtered: 0, total: 0 }
+        }
+      )
     },
     settings: {
       global: {
@@ -417,6 +447,7 @@ export const defaultState = {
     },
     intentId: 'testIntent',
     organization: {
+      addons: [],
       id: 1,
       name: 'test',
       plan: 'os',
@@ -454,6 +485,7 @@ export const defaultState = {
     releasesList: {
       ...DeviceConstants.DEVICE_LIST_DEFAULTS,
       searchedIds: [],
+      isLoading: false,
       releaseIds: ['r1'],
       sort: {
         direction: SORTING_OPTIONS.desc,
@@ -498,7 +530,7 @@ export const releasesList = Array.from({ length: 5000 }, (x, i) => ({
 
 export const permissionSets = [
   {
-    name: defaultPermissionSets.Basic.value,
+    ...defaultPermissionSets.Basic,
     object: permissionSetObjectTypes.empty,
     description: 'Set containing basic permissions.',
     permissions: [
@@ -512,7 +544,7 @@ export const permissionSets = [
     ]
   },
   {
-    name: defaultPermissionSets.ManageReleases.value,
+    ...defaultPermissionSets.ManageReleases,
     action: uiPermissionsById.manage.title,
     object: permissionSetObjectTypes.releases,
     description: 'Set of permissions which allows user to manage releases',
@@ -525,28 +557,28 @@ export const permissionSets = [
     ]
   },
   {
-    name: defaultPermissionSets.ReadUsers.value,
+    ...defaultPermissionSets.ReadUsers,
     action: uiPermissionsById.read.title,
     object: permissionSetObjectTypes.userManagement,
     description: 'Set of permissions which allows user to view other users',
     permissions: [{ action: 'http', object: { type: 'GET', value: '^/api/management/(v[1-9])/useradm/' } }]
   },
   {
-    name: defaultPermissionSets.ManageUsers.value,
+    ...defaultPermissionSets.ManageUsers,
     action: uiPermissionsById.manage.title,
     object: permissionSetObjectTypes.userManagement,
     description: 'Set of permissions which allows user manage other user accounts',
     permissions: [{ action: 'http', object: { type: 'any', value: '^/api/management/(v[1-9])/useradm/' } }]
   },
   {
-    name: defaultPermissionSets.ReadAuditLogs.value,
+    ...defaultPermissionSets.ReadAuditLogs,
     action: uiPermissionsById.read.title,
     object: 'System audit log',
     description: 'Set of permissions which allows user to view system audit log',
     permissions: [{ action: 'http', object: { type: 'GET', value: '^/api/management/(v[1-9]|0.1.0)/auditlogs/logs' } }]
   },
   {
-    name: defaultPermissionSets.DeployToDevices.value,
+    ...defaultPermissionSets.DeployToDevices,
     action: 'Deploy',
     object: permissionSetObjectTypes.groups,
     description: 'Set of permissions which allows user to deploy to devices',
@@ -554,7 +586,15 @@ export const permissionSets = [
     supported_scope_types: ['DeviceGroups']
   },
   {
-    name: defaultPermissionSets.ConnectToDevices.value,
+    ...defaultPermissionSets.ConfigureDevices,
+    action: 'Configure',
+    object: permissionSetObjectTypes.groups,
+    description: 'Set of permissions which allows user to manage configuration of the devices',
+    permissions: [{ action: 'http', object: { type: 'any', value: '^/api/management/(v[1-9])/deviceconfig/' } }],
+    supported_scope_types: ['DeviceGroups']
+  },
+  {
+    ...defaultPermissionSets.ConnectToDevices,
     action: 'Connect',
     object: permissionSetObjectTypes.groups,
     description: 'Set of permissions which allows user to use remote terminal and file transfer',
@@ -566,14 +606,14 @@ export const permissionSets = [
     supported_scope_types: ['DeviceGroups']
   },
   {
-    name: defaultPermissionSets.SuperUser.value,
+    ...defaultPermissionSets.SuperUser,
     action: 'Any',
     object: permissionSetObjectTypes.any,
     description: 'Set of permissions which allows user to do anything',
     permissions: [{ action: 'any', object: { type: 'any', value: 'any' } }]
   },
   {
-    name: defaultPermissionSets.UploadArtifacts.value,
+    ...defaultPermissionSets.UploadArtifacts,
     action: 'Upload',
     object: permissionSetObjectTypes.artifacts,
     description: 'Set of permissions which allows user to upload artifacts',
@@ -583,7 +623,7 @@ export const permissionSets = [
     ]
   },
   {
-    name: defaultPermissionSets.ReadDevices.value,
+    ...defaultPermissionSets.ReadDevices,
     action: uiPermissionsById.read.title,
     object: permissionSetObjectTypes.groups,
     description: 'Set of permissions which allows user to view devices',
@@ -596,7 +636,7 @@ export const permissionSets = [
     supported_scope_types: ['DeviceGroups']
   },
   {
-    name: defaultPermissionSets.ManageDevices.value,
+    ...defaultPermissionSets.ManageDevices,
     action: uiPermissionsById.manage.title,
     object: permissionSetObjectTypes.groups,
     description: 'Set of permissions which allows user to manage devices',
@@ -608,7 +648,7 @@ export const permissionSets = [
     supported_scope_types: ['DeviceGroups']
   },
   {
-    name: defaultPermissionSets.ReadReleases.value,
+    ...defaultPermissionSets.ReadReleases,
     action: uiPermissionsById.read.title,
     object: permissionSetObjectTypes.releases,
     description: 'Set of permissions which allows user to view releases',
@@ -626,7 +666,7 @@ const expectedParsedRoles = {
     isCustom: undefined,
     uiPermissions: {
       ...emptyUiPermissions,
-      groups: { bestgroup: [uiPermissionsById.connect.value, uiPermissionsById.read.value] },
+      groups: { bestgroup: [uiPermissionsById.read.value, uiPermissionsById.connect.value] },
       userManagement: [uiPermissionsById.manage.value]
     }
   },
@@ -644,11 +684,19 @@ const expectedParsedRoles = {
       groups: { dyn: [uiPermissionsById.read.value, uiPermissionsById.deploy.value] }
     }
   },
-  kljlkk: { editable: true, isCustom: false, uiPermissions: { ...emptyUiPermissions, groups: { bestgroup: [uiPermissionsById.connect.value] } } },
+  kljlkk: {
+    editable: true,
+    isCustom: false,
+    uiPermissions: { ...emptyUiPermissions, groups: { bestgroup: [uiPermissionsById.read.value, uiPermissionsById.connect.value] } }
+  },
   yyyyy: {
     editable: true,
     isCustom: undefined,
-    uiPermissions: { ...emptyUiPermissions, groups: { dockerclient: [uiPermissionsById.manage.value] }, releases: [uiPermissionsById.manage.value] }
+    uiPermissions: {
+      ...emptyUiPermissions,
+      groups: { dockerclient: [uiPermissionsById.read.value, uiPermissionsById.manage.value] },
+      releases: { [ALL_RELEASES]: [uiPermissionsById.manage.value] }
+    }
   }
 };
 

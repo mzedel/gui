@@ -1,3 +1,16 @@
+// Copyright 2015 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import React, { useEffect, useRef, useState } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -74,11 +87,10 @@ export const Deployments = ({
           </h4>
           {deploymentsCount ? (
             <>
-              {Object.keys(stateMap).reduce((accu, key) => {
+              {Object.entries(stateMap).reduce((accu, [key, Component]) => {
                 if (!deployments[key]) {
                   return accu;
                 }
-                const Component = stateMap[key];
                 accu.push(
                   <React.Fragment key={key}>
                     <h5 className="margin-bottom-none">{deploymentDisplayStates[key]}</h5>

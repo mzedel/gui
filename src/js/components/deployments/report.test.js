@@ -1,8 +1,21 @@
+// Copyright 2019 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import React from 'react';
 import { Provider } from 'react-redux';
 
 import { prettyDOM } from '@testing-library/dom';
-import { cleanup, waitFor } from '@testing-library/react';
+import { act, cleanup, waitFor } from '@testing-library/react';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 
@@ -19,13 +32,6 @@ describe('DeploymentReport Component', () => {
       ...defaultState,
       deployments: {
         ...defaultState.deployments,
-        byId: {
-          ...defaultState.deployments.byId,
-          d1: {
-            ...defaultState.deployments.byId.d1,
-            artifact_name: 'a1'
-          }
-        },
         selectedDeviceIds: [defaultState.deployments.byId.d1.devices.a1.id],
         selectionState: {
           selectedId: defaultState.deployments.byId.d1.id
@@ -43,8 +49,8 @@ describe('DeploymentReport Component', () => {
       </Provider>
     );
     const { asFragment, rerender } = render(ui);
-    jest.advanceTimersByTime(5000);
-    waitFor(() => rerender(ui));
+    act(() => jest.advanceTimersByTime(5000));
+    await waitFor(() => rerender(ui));
     const view = prettyDOM(asFragment().childNodes[1], 100000, { highlight: false })
       .replace(/id="mui-[0-9]*"/g, '')
       .replace(/aria-labelledby="(mui-[0-9]* *)*"/g, '')

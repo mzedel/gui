@@ -1,3 +1,16 @@
+// Copyright 2021 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import React, { useEffect, useMemo, useState } from 'react';
 
 // material ui
@@ -28,6 +41,10 @@ export const getUserSSOState = user => {
   const provider = isOAuth2 ? OAuth2Providers.find(provider => sso.some(({ kind }) => kind.includes(provider.id))) ?? genericProvider : null;
   return { isOAuth2, provider };
 };
+
+const mapPermissions = permissions => permissions.map(permission => uiPermissionsById[permission].title).join(', ');
+
+const scopedPermissionAreas = ['groups', 'releases'];
 
 export const UserDefinition = ({ currentUser, isEnterprise, onCancel, onSubmit, onRemove, roles, selectedUser }) => {
   const { email = '', id } = selectedUser;
@@ -74,14 +91,13 @@ export const UserDefinition = ({ currentUser, isEnterprise, onCancel, onSubmit, 
   const togglePasswordReset = () => setShouldResetPassword(toggle);
 
   const { areas, groups } = useMemo(() => {
-    const things = { areas: {}, groups: {} };
+    const emptySelection = { areas: {}, groups: {}, releases: {} };
     if (!(selectedRoles && roles)) {
-      return things;
+      return emptySelection;
     }
-    const mapPermissions = permissions => permissions.map(permission => uiPermissionsById[permission].title).join(', ');
 
     return Object.entries(mapUserRolesToUiPermissions(selectedRoles, roles)).reduce((accu, [key, values]) => {
-      if (key === 'groups') {
+      if (scopedPermissionAreas.includes(key)) {
         accu[key] = Object.entries(values).reduce((groupsAccu, [name, uiPermissions]) => {
           groupsAccu[name] = mapPermissions(uiPermissions);
           return groupsAccu;
@@ -90,7 +106,7 @@ export const UserDefinition = ({ currentUser, isEnterprise, onCancel, onSubmit, 
         accu.areas[uiPermissionsByArea[key].title] = mapPermissions(values);
       }
       return accu;
-    }, things);
+    }, emptySelection);
   }, [selectedRoles, roles]);
 
   const isSubmitDisabled = !selectedRoles.length;

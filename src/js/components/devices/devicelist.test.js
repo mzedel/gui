@@ -1,8 +1,21 @@
+// Copyright 2019 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import React from 'react';
 import { Provider } from 'react-redux';
 
 import { prettyDOM } from '@testing-library/dom';
-import { act, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
@@ -77,6 +90,7 @@ describe('DeviceList Component', () => {
   });
 
   it('works as expected', async () => {
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
     const onExpandClickMock = jest.fn();
     const onResizeColumns = jest.fn();
     const onPageChange = jest.fn();
@@ -106,12 +120,12 @@ describe('DeviceList Component', () => {
       </Provider>
     );
     render(ui);
-    act(() => userEvent.click(screen.getByText(devices[0].id)));
+    await user.click(screen.getByText(devices[0].id));
     expect(onExpandClickMock).toHaveBeenCalled();
 
-    act(() => userEvent.click(screen.getAllByRole('checkbox')[0]));
+    await user.click(screen.getAllByRole('checkbox')[0]);
     expect(onSelect).toHaveBeenCalledWith([0, 1]);
-    act(() => userEvent.click(screen.getAllByRole('checkbox')[2]));
+    await user.click(screen.getAllByRole('checkbox')[2]);
     expect(onSelect).toHaveBeenCalledWith([1]);
   }, 30000);
 });

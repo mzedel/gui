@@ -1,4 +1,17 @@
-import React, { useEffect } from 'react';
+// Copyright 2019 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
+import React, { useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
 
 import { CheckCircle as CheckCircleIcon } from '@mui/icons-material';
@@ -16,12 +29,18 @@ import { MenderTooltipClickable } from '../common/mendertooltip';
 import { CompletionButton } from './deploymentcompletetip';
 
 export const OnboardingCompleteTip = ({ anchor, docsVersion, getDeviceById, getDevicesByStatus, setOnboardingComplete, url }) => {
+  const timer = useRef();
   useEffect(() => {
     getDevicesByStatus(DeviceConstants.DEVICE_STATES.accepted)
-      .then(tasks => tasks[tasks.length - 1].deviceAccu.ids.map(getDeviceById))
-      .finally(() => setTimeout(() => setOnboardingComplete(true), 120000));
+      .then(tasks => {
+        return Promise.all(tasks[tasks.length - 1].deviceAccu.ids.map(getDeviceById));
+      })
+      .finally(() => {
+        timer.current = setTimeout(() => setOnboardingComplete(true), 120000);
+      });
     return () => {
       setOnboardingComplete(true);
+      clearTimeout(timer.current);
     };
   }, []);
 
@@ -59,8 +78,8 @@ export const OnboardingCompleteTip = ({ anchor, docsVersion, getDeviceById, getD
             Proceed to one of the following tutorials (listed in recommended order):
             <ol>
               <li key="deploy-a-system-update">
-                <a href={`https://docs.mender.io/${docsVersion}get-started/deploy-a-system-update`} target="_blank" rel="noopener noreferrer">
-                  Deploy a system update
+                <a href={`https://docs.mender.io/${docsVersion}get-started/deploy-an-operating-system-update`} target="_blank" rel="noopener noreferrer">
+                  Deploy an operating system update
                 </a>
               </li>
               <li key="deploy-a-container-update">

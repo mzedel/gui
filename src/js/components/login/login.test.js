@@ -1,3 +1,16 @@
+// Copyright 2019 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import React from 'react';
 import { Provider } from 'react-redux';
 
@@ -39,20 +52,21 @@ describe('Login Component', () => {
   });
 
   it('works as intended', async () => {
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
     const submitCheck = jest.fn().mockResolvedValue();
     const ui = <LoginComponent isHosted={true} currentUser={{}} loginUser={submitCheck} logoutUser={jest.fn} setSnackbar={jest.fn} />;
     const { rerender } = render(ui);
 
-    userEvent.type(screen.queryByLabelText(/your email/i), 'something@example.com');
-    userEvent.type(screen.queryByLabelText(/password/i), 'mysecretpassword!123');
+    await user.type(screen.queryByLabelText(/your email/i), 'something@example.com');
+    await user.type(screen.queryByLabelText(/password/i), 'mysecretpassword!123');
     expect(screen.queryByLabelText(/Two Factor Authentication Code/i)).not.toBeInTheDocument();
     submitCheck.mockRejectedValueOnce({ error: '2fa needed' });
-    userEvent.click(screen.getByRole('button', { name: /Log in/i }));
+    await user.click(screen.getByRole('button', { name: /Log in/i }));
     expect(submitCheck).toHaveBeenCalled();
     await waitFor(() => rerender(ui));
     expect(screen.queryByLabelText(/Two Factor Authentication Code/i)).toBeInTheDocument();
-    userEvent.type(screen.queryByLabelText(/Two Factor Authentication Code/i), '123456');
-    userEvent.click(screen.getByRole('button', { name: /Log in/i }));
+    await user.type(screen.queryByLabelText(/Two Factor Authentication Code/i), '123456');
+    await user.click(screen.getByRole('button', { name: /Log in/i }));
     expect(submitCheck).toHaveBeenCalled();
   });
 });

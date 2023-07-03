@@ -1,3 +1,16 @@
+// Copyright 2020 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -13,7 +26,7 @@ import { setSnackbar } from '../../actions/appActions';
 import { getDeploymentsByStatus, setDeploymentsState } from '../../actions/deploymentActions';
 import { DEPLOYMENT_STATES } from '../../constants/deploymentConstants';
 import { tryMapDeployments } from '../../helpers';
-import { getIsEnterprise, getUserCapabilities } from '../../selectors';
+import { getIdAttribute, getIsEnterprise, getUserCapabilities } from '../../selectors';
 import { clearAllRetryTimers, clearRetryTimer, setRetryTimer } from '../../utils/retrytimer';
 import EnterpriseNotification from '../common/enterpriseNotification';
 import { DeploymentDeviceCount, DeploymentEndTime, DeploymentPhases, DeploymentStartTime } from './deploymentitem';
@@ -192,6 +205,7 @@ const mapStateToProps = state => {
     canConfigure,
     canDeploy,
     count: state.deployments.byStatus.scheduled.total,
+    idAttribute: getIdAttribute(state).attribute,
     // TODO: isEnterprise is misleading here, but is passed down to the DeploymentListItem, this should be renamed
     isEnterprise: getIsEnterprise(state) || plan !== 'os',
     items: scheduled,

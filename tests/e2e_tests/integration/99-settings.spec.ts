@@ -1,9 +1,22 @@
+// Copyright 2021 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import { Decoder } from '@nuintun/qrcode';
 import * as fs from 'fs';
 import { PNG } from 'pngjs';
 
 import test, { expect } from '../fixtures/fixtures';
-import { baseUrlToDomain, generateOtp, login, startClient, tenantTokenRetrieval } from '../utils/commands';
+import { baseUrlToDomain, generateOtp, login, prepareCookies, startClient, tenantTokenRetrieval } from '../utils/commands';
 import { selectors } from '../utils/constants';
 
 test.describe('Settings', () => {
@@ -97,11 +110,7 @@ test.describe('Settings', () => {
       test.skip(environment !== 'staging');
       const { token, userId } = await login(username, password, baseUrl);
       const domain = baseUrlToDomain(baseUrl);
-      await context.addCookies([
-        { name: 'JWT', value: token, path: '/', domain },
-        { name: `${userId}-onboarded`, value: 'true', path: '/', domain },
-        { name: 'cookieconsent_status', value: 'allow', path: '/', domain }
-      ]);
+      context = await prepareCookies(context, domain, userId, token);
       const page = await context.newPage();
       await page.goto(`${baseUrl}ui`);
 
@@ -232,11 +241,7 @@ test.describe('Settings', () => {
       }
       const { token, userId } = await login(username, replacementPassword, baseUrl);
       const domain = baseUrlToDomain(baseUrl);
-      await context.addCookies([
-        { name: 'JWT', value: token, path: '/', domain },
-        { name: `${userId}-onboarded`, value: 'true', path: '/', domain },
-        { name: 'cookieconsent_status', value: 'allow', path: '/', domain }
-      ]);
+      context = await prepareCookies(context, domain, userId, token);
       const page = await context.newPage();
       await page.goto(`${baseUrl}ui`);
       await page.waitForSelector('text=/License information/i');

@@ -1,7 +1,20 @@
+// Copyright 2019 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import React from 'react';
 import { Provider } from 'react-redux';
 
-import { act, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
@@ -82,15 +95,16 @@ describe('MyOrganization Component', () => {
   });
 
   it('supports modifying SSO settings', async () => {
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
     const ui = (
       <Provider store={store}>
         <MyOrganization />
       </Provider>
     );
     const { rerender } = render(ui);
-    userEvent.click(screen.getByRole('checkbox'));
+    await user.click(screen.getByRole('checkbox'));
     await waitFor(() => rerender(ui));
-    act(() => userEvent.click(screen.getByText(/input with the text editor/i)));
+    await user.click(screen.getByText(/input with the text editor/i));
 
     const config = '<div>not quite right</div>';
     const str = JSON.stringify(config);
@@ -98,12 +112,12 @@ describe('MyOrganization Component', () => {
     const file = new File([blob], 'values.xml', { type: 'application/xml' });
     File.prototype.text = jest.fn().mockResolvedValue(str);
     const input = document.querySelector('input[type=file]');
-    act(() => userEvent.upload(input, file));
+    await user.upload(input, file);
     await waitFor(() => rerender(ui));
     expect(screen.getByText(/import from a file/i)).toBeVisible();
     await waitFor(() => rerender(ui));
-    act(() => userEvent.upload(screen.getByText(/import from a file/i).previousSibling, file));
-    act(() => userEvent.click(screen.getByRole('button', { name: /cancel/i })));
+    await user.upload(screen.getByText(/import from a file/i).previousSibling, file);
+    await user.click(screen.getByRole('button', { name: /cancel/i }));
     await waitFor(() => rerender(ui));
     expect(screen.getByRole('checkbox')).not.toBeChecked();
   });

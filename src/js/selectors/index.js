@@ -1,9 +1,29 @@
+// Copyright 2020 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import { createSelector } from '@reduxjs/toolkit';
 
 import { mapUserRolesToUiPermissions } from '../actions/userActions';
 import { PLANS } from '../constants/appConstants';
 import { DEPLOYMENT_STATES } from '../constants/deploymentConstants';
-import { ATTRIBUTE_SCOPES, DEVICE_ISSUE_OPTIONS, DEVICE_LIST_MAXIMUM_LENGTH, DEVICE_ONLINE_CUTOFF, EXTERNAL_PROVIDER } from '../constants/deviceConstants';
+import {
+  ATTRIBUTE_SCOPES,
+  DEVICE_ISSUE_OPTIONS,
+  DEVICE_LIST_MAXIMUM_LENGTH,
+  DEVICE_ONLINE_CUTOFF,
+  EXTERNAL_PROVIDER,
+  UNGROUPED_GROUP
+} from '../constants/deviceConstants';
 import { rolesByName, twoFAStates, uiPermissionsById } from '../constants/userConstants';
 import { attributeDuplicateFilter, duplicateFilter, getDemoDeviceAddress as getDemoDeviceAddressHelper } from '../helpers';
 
@@ -13,6 +33,7 @@ const getRolesById = state => state.users.rolesById;
 const getOrganization = state => state.organization.organization;
 const getAcceptedDevices = state => state.devices.byStatus.accepted;
 const getDevicesById = state => state.devices.byId;
+const getGroupsById = state => state.devices.groups.byId;
 const getSearchedDevices = state => state.app.searchState.deviceIds;
 const getListedDevices = state => state.devices.deviceList.deviceIds;
 const getFilteringAttributes = state => state.devices.filteringAttributes;
@@ -38,7 +59,8 @@ export const getHas2FA = createSelector(
 );
 
 export const getDemoDeviceAddress = createSelector([getDevicesList, getOnboarding], (devices, { approach, demoArtifactPort }) => {
-  return getDemoDeviceAddressHelper(devices, approach, demoArtifactPort);
+  const demoDeviceAddress = `http://${getDemoDeviceAddressHelper(devices, approach)}`;
+  return demoArtifactPort ? `${demoDeviceAddress}:${demoArtifactPort}` : demoDeviceAddress;
 });
 
 const listItemMapper = (byId, ids, { defaultObject = {}, cutOffSize = DEVICE_LIST_MAXIMUM_LENGTH }) => {
@@ -94,6 +116,30 @@ export const getFilterAttributes = createSelector(
   }
 );
 
+export const getGroups = createSelector([getGroupsById], groupsById => {
+  const groupNames = Object.keys(groupsById).sort();
+  const groupedGroups = Object.entries(groupsById)
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .reduce(
+      (accu, [groupname, group]) => {
+        const name = groupname === UNGROUPED_GROUP.id ? UNGROUPED_GROUP.name : groupname;
+        const groupItem = { ...group, groupId: name, name: groupname };
+        if (group.filters.length > 0) {
+          if (groupname !== UNGROUPED_GROUP.id) {
+            accu.dynamic.push(groupItem);
+          } else {
+            accu.ungrouped.push(groupItem);
+          }
+        } else {
+          accu.static.push(groupItem);
+        }
+        return accu;
+      },
+      { dynamic: [], static: [], ungrouped: [] }
+    );
+  return { groupNames, ...groupedGroups };
+});
+
 export const getDeviceTwinIntegrations = createSelector([getExternalIntegrations], integrations =>
   integrations.filter(integration => integration.id && EXTERNAL_PROVIDER[integration.provider]?.deviceTwin)
 );
@@ -140,27 +186,27 @@ export const getUserRoles = createSelector(
   }
 );
 
+const hasPermission = (thing, permission) => Object.values(thing).some(permissions => permissions.includes(permission));
+
 export const getUserCapabilities = createSelector([getUserRoles], ({ uiPermissions }) => {
-  const canManageReleases = uiPermissions.releases.includes(uiPermissionsById.manage.value);
-  const canReadReleases = canManageReleases || uiPermissions.releases.includes(uiPermissionsById.read.value);
-  const canUploadReleases = canManageReleases || uiPermissions.releases.includes(uiPermissionsById.upload.value);
+  const canManageReleases = hasPermission(uiPermissions.releases, uiPermissionsById.manage.value);
+  const canReadReleases = canManageReleases || hasPermission(uiPermissions.releases, uiPermissionsById.read.value);
+  const canUploadReleases = canManageReleases || hasPermission(uiPermissions.releases, uiPermissionsById.upload.value);
 
   const canAuditlog = uiPermissions.auditlog.includes(uiPermissionsById.read.value);
 
   const canReadUsers = uiPermissions.userManagement.includes(uiPermissionsById.read.value);
   const canManageUsers = uiPermissions.userManagement.includes(uiPermissionsById.manage.value);
 
-  const canReadDevices = Object.values(uiPermissions.groups).some(groupPermissions => groupPermissions.includes(uiPermissionsById.read.value));
+  const canReadDevices = hasPermission(uiPermissions.groups, uiPermissionsById.read.value);
   const canWriteDevices = Object.values(uiPermissions.groups).some(
     groupPermissions => groupPermissions.includes(uiPermissionsById.read.value) && groupPermissions.length > 1
   );
-  const canTroubleshoot = Object.values(uiPermissions.groups).some(groupPermissions => groupPermissions.includes(uiPermissionsById.connect.value));
-  const canManageDevices = Object.values(uiPermissions.groups).some(groupPermissions => groupPermissions.includes(uiPermissionsById.manage.value));
-  const canConfigure = Object.values(uiPermissions.groups).some(groupPermissions => groupPermissions.includes(uiPermissionsById.configure.value));
+  const canTroubleshoot = hasPermission(uiPermissions.groups, uiPermissionsById.connect.value);
+  const canManageDevices = hasPermission(uiPermissions.groups, uiPermissionsById.manage.value);
+  const canConfigure = hasPermission(uiPermissions.groups, uiPermissionsById.configure.value);
 
-  const canDeploy =
-    uiPermissions.deployments.includes(uiPermissionsById.deploy.value) ||
-    Object.values(uiPermissions.groups).some(groupPermissions => groupPermissions.includes(uiPermissionsById.deploy.value));
+  const canDeploy = uiPermissions.deployments.includes(uiPermissionsById.deploy.value) || hasPermission(uiPermissions.groups, uiPermissionsById.deploy.value);
   const canReadDeployments = uiPermissions.deployments.includes(uiPermissionsById.read.value);
 
   return {
@@ -250,7 +296,14 @@ export const getRecentDeployments = createSelector([getDeploymentsById, getDeplo
       if (!relevantDeploymentStates.includes(state) || !byStatus.deploymentIds.length) {
         return accu;
       }
-      accu[state] = byStatus.deploymentIds.map(id => deploymentsById[id]).slice(0, DEPLOYMENT_CUTOFF);
+      accu[state] = byStatus.deploymentIds
+        .reduce((accu, id) => {
+          if (deploymentsById[id]) {
+            accu.push(deploymentsById[id]);
+          }
+          return accu;
+        }, [])
+        .slice(0, DEPLOYMENT_CUTOFF);
       accu.total += byStatus.total;
       return accu;
     },

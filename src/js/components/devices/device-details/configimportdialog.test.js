@@ -1,6 +1,19 @@
+// Copyright 2021 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import React from 'react';
 
-import { act, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { undefineds } from '../../../../../tests/mockData';
@@ -16,19 +29,20 @@ describe('ConfigImportDialog Component', () => {
   });
 
   it('works as intended', async () => {
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
     const submitMock = jest.fn();
     const menderFile = new File(['testContent plain'], 'test.pem');
 
     const ui = <ConfigImportDialog onSubmit={submitMock} onCancel={jest.fn} setSnackbar={jest.fn} />;
     const { rerender } = render(ui);
     expect(screen.getByText(/the current default/i)).toBeInTheDocument();
-    userEvent.click(screen.getByText(/the current default/i));
-    userEvent.click(screen.getByRole('button', { name: 'Import' }));
+    await user.click(screen.getByText(/the current default/i));
+    await user.click(screen.getByRole('button', { name: 'Import' }));
     expect(submitMock).toHaveBeenCalledWith({ importType: 'default', config: null });
 
     // container.querySelector doesn't work in this scenario for some reason -> but querying document seems to work
     const uploadInput = document.querySelector('.dropzone input');
-    act(() => userEvent.upload(uploadInput, menderFile));
+    await user.upload(uploadInput, menderFile);
     await waitFor(() => rerender(ui));
     expect(uploadInput.files).toHaveLength(1);
   });

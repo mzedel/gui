@@ -1,3 +1,16 @@
+// Copyright 2017 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import React from 'react';
 
 import jwtDecode from 'jwt-decode';
@@ -39,7 +52,9 @@ export const groupDeploymentDevicesStats = deployment => {
 
 export const statCollector = (items, statistics) => items.reduce((accu, property) => accu + Number(statistics[property] || 0), 0);
 export const groupDeploymentStats = (deployment, withSkipped) => {
-  const stats = { ...defaultStats, ...deployment.stats };
+  const { statistics = {} } = deployment;
+  const { status = {} } = statistics;
+  const stats = { ...defaultStats, ...status };
   let groupStates = deploymentStatesToSubstates;
   let result = {};
   if (withSkipped) {
@@ -127,6 +142,7 @@ export const versionCompare = (v1, v2) => {
  * Deep compare
  *
  */
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export function deepCompare() {
   var i, l, leftChain, rightChain;
 
@@ -362,8 +378,7 @@ const collectAddressesFrom = devices =>
     return collector;
   }, []);
 
-export const getDemoDeviceAddress = (devices, onboardingApproach, port) => {
-  let targetUrl = '';
+export const getDemoDeviceAddress = (devices, onboardingApproach) => {
   const defaultVitualizedIp = '10.0.2.15';
   const addresses = collectAddressesFrom(devices);
   const address = addresses.reduce((accu, item) => {
@@ -372,12 +387,10 @@ export const getDemoDeviceAddress = (devices, onboardingApproach, port) => {
     }
     return item;
   }, null);
-  targetUrl = `http://${address}`;
   if (!address || (onboardingApproach === 'virtual' && (navigator.appVersion.indexOf('Win') != -1 || navigator.appVersion.indexOf('Mac') != -1))) {
-    targetUrl = `http://localhost`;
+    return 'localhost';
   }
-  targetUrl = port ? `${targetUrl}:${port}` : targetUrl;
-  return targetUrl;
+  return address;
 };
 
 export const detectOsIdentifier = () => {
@@ -487,6 +500,25 @@ export const extractSoftware = (attributes = {}) => {
       return accu;
     },
     { software: [], nonSoftware: [] }
+  );
+};
+
+export const extractSoftwareItem = (artifactProvides = {}) => {
+  const { software } = extractSoftware(artifactProvides);
+  return (
+    software
+      .reduce((accu, item) => {
+        const infoItems = item[0].split('.');
+        if (infoItems[infoItems.length - 1] !== 'version') {
+          return accu;
+        }
+        accu.push({ key: infoItems[0], name: infoItems.slice(1, infoItems.length - 1).join('.'), version: item[1], nestingLevel: infoItems.length });
+        return accu;
+      }, [])
+      // we assume the smaller the nesting level in the software name, the closer the software is to the rootfs/ the higher the chances we show the rootfs
+      // sort based on this assumption & then only return the first item (can't use index access, since there might not be any software item at all)
+      .sort((a, b) => a.nestingLevel - b.nestingLevel)
+      .reduce((accu, item) => accu ?? item, undefined)
   );
 };
 

@@ -1,6 +1,19 @@
+// Copyright 2019 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import React, { useState } from 'react';
 
-import { FormControl, MenuItem, Select, TextField } from '@mui/material';
+import { FormControl, MenuItem, Select } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import { makeStyles } from 'tss-react/mui';
 
@@ -14,8 +27,6 @@ const useStyles = makeStyles()(() => ({
   infoStyle: { minWidth: 400, borderBottom: 'none' },
   pickerStyle: { marginBottom: 15, width: 'min-content' }
 }));
-
-const renderInput = params => <TextField {...params} style={{ minWidth: 400 }} />;
 
 export const ScheduleRollout = ({ canSchedule, commonClasses, setDeploymentSettings, deploymentObject, open = false }) => {
   const [isPickerOpen, setIsPickerOpen] = useState(open);
@@ -70,7 +81,7 @@ export const ScheduleRollout = ({ canSchedule, commonClasses, setDeploymentSetti
             minDateTime={moment()}
             disabled={!canSchedule}
             onChange={date => handleStartTimeChange(date.toISOString())}
-            renderInput={renderInput}
+            slotProps={{ textField: { style: { minWidth: 400 } } }}
             value={startTime}
           />
         </FormControl>

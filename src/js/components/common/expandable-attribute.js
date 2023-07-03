@@ -1,3 +1,16 @@
+// Copyright 2019 Northern.tech AS
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
 import React, { useEffect, useRef, useState } from 'react';
 
 // material ui
@@ -12,16 +25,15 @@ const defaultClasses = { root: 'attributes' };
 
 export const ExpandableAttribute = ({
   className = '',
-  component = 'li',
   copyToClipboard,
-  disableGutters,
   dividerDisabled,
   primary,
   secondary,
   secondaryTypographyProps = {},
   setSnackbar,
   style,
-  textClasses
+  textClasses,
+  ...remainder
 }) => {
   const textContent = useRef(null);
   const [expanded, setExpanded] = useState(false);
@@ -65,7 +77,7 @@ export const ExpandableAttribute = ({
 
   return (
     <div className={className} onClick={onClick} onMouseEnter={() => setTooltipVisible(true)} onMouseLeave={() => setTooltipVisible(false)} style={style}>
-      <ListItem classes={cssClasses} disableGutters={disableGutters} divider={!dividerDisabled} component={component}>
+      <ListItem classes={cssClasses} divider={!dividerDisabled} {...remainder}>
         <ListItemText
           primary={primary}
           secondary={secondaryText}
