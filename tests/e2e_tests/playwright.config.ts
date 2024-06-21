@@ -29,15 +29,6 @@ const launchOptions: LaunchOptions = {
   // executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 };
 
-export const contextOptions = {
-  ...contextArgs,
-  contextOptions: contextArgs,
-  screenshot: 'only-on-failure',
-  video: 'retain-on-failure',
-  // headless: false,
-  launchOptions
-};
-
 const options: PlaywrightTestConfig = {
   forbidOnly: !!process.env.CI,
   reporter: process.env.CI
@@ -70,7 +61,15 @@ const options: PlaywrightTestConfig = {
   retries: 2,
   testDir: 'integration',
   timeout: 60000,
-  use: contextOptions
+  use: {
+    ...contextArgs,
+    contextOptions: contextArgs,
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
+    // headless: false,
+    launchOptions
+    // trace: process.env.BROWSER == 'webkit' ? 'retain-on-failure' : 'off'
+  }
 };
 
 export default options;
