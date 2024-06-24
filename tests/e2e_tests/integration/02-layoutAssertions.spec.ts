@@ -47,7 +47,7 @@ test.describe('Layout assertions', () => {
       console.log(`no accepted device present so far`);
     }
     if (!hasAcceptedDevice) {
-      const pendingMessage = await page.locator(`text=/pending authorization/i`);
+      const pendingMessage = await page.getByText(/pending authorization/i);
       await pendingMessage.waitFor({ timeout: timeouts.sixtySeconds });
       await pendingMessage.click();
       await page.click(selectors.deviceListCheckbox);
@@ -59,9 +59,9 @@ test.describe('Layout assertions', () => {
     await page.waitForSelector(`css=${selectors.deviceListItem} >> text=/original/`, { timeout: timeouts.sixtySeconds });
     const element = await page.textContent(selectors.deviceListItem);
     expect(element.includes('original')).toBeTruthy();
-    await page.click(`${selectors.deviceListItem} div:last-child`);
-    await page.waitForSelector(`text=/Device information for/i`);
-    expect(await page.isVisible('text=Authentication status')).toBeTruthy();
+    await page.locator(`css=${selectors.deviceListItem} div:last-child`).last().click();
+    await page.getByText(/Device information for/i).waitFor();
+    expect(await page.getByText('Authentication status')).toBeVisible();
   });
 
   test('can group a device', async ({ loggedInPage: page }) => {
