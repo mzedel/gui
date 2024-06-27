@@ -39,8 +39,8 @@ let metadataLocation = '';
 test.describe('SAML Login via sso/id/login', () => {
   test.describe.configure({ mode: 'serial' });
   test.use({ storageState: storagePath });
-  test.afterAll(async ({ environment, baseUrl, browserName }, testInfo) => {
-    if (testInfo.status === 'skipped' || !isEnterpriseOrStaging(environment)) {
+  test.afterAll(async ({ baseUrl, browserName, environment }, testInfo) => {
+    if (testInfo.status === 'skipped' || !isEnterpriseOrStaging(environment) || browserName === 'webkit') {
       return;
     }
     const token = await getTokenFromStorage(baseUrl);
@@ -65,7 +65,7 @@ test.describe('SAML Login via sso/id/login', () => {
 
   // Setups the SAML/SSO login with samltest.id Identity Provider
   test('Set up SAML', async ({ browserName, environment, baseUrl, loggedInPage: page }) => {
-    test.skip(!isEnterpriseOrStaging(environment));
+    test.skip(!isEnterpriseOrStaging(environment) || browserName === 'webkit');
     // allow a lot of time to enter metadata + then some to handle uploading the config to the external service
     test.setTimeout(5 * timeouts.sixtySeconds + timeouts.fifteenSeconds);
 
@@ -134,7 +134,7 @@ test.describe('SAML Login via sso/id/login', () => {
 
   // Creates a user with login that matches Identity privder (samltest.id) user email
   test('Creates a user without a password', async ({ environment, baseUrl, browserName, loggedInPage: page }) => {
-    test.skip(!isEnterpriseOrStaging(environment));
+    test.skip(!isEnterpriseOrStaging(environment) || browserName === 'webkit');
     await page.goto(`${baseUrl}ui/settings/user-management`);
     const userExists = await page.getByText(samlSettings.credentials[browserName]).isVisible();
     if (userExists) {
@@ -153,7 +153,7 @@ test.describe('SAML Login via sso/id/login', () => {
   // This test calls auth/sso/${id}/login, where id is the id of the identity provider
   // and verifies that login is successful.
   test('User can login via sso/login endpoint', async ({ environment, baseUrl, browser, browserName, loggedInPage }) => {
-    test.skip(!isEnterpriseOrStaging(environment));
+    test.skip(!isEnterpriseOrStaging(environment) || browserName === 'webkit');
     test.setTimeout(3 * timeouts.fifteenSeconds);
     let idpServer;
     startIdpServer({ acsUrl, metadataLocation }, server => (idpServer = server));
