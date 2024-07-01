@@ -264,8 +264,8 @@ test:prep:
     paths:
       - mender-stress-test-client
     expire_in: 30 days
-  tags:
-    - mender-qa-worker-generic-light
+  # tags:
+  #   - mender-qa-worker-generic-light
 
 # excludes non multiplatform build job
 build:docker:
