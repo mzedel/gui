@@ -353,8 +353,8 @@ build:docker-multiplatform:
       - tests/e2e_tests/test-results
       - logs
     when: always
-  tags:
-    - mender-qa-worker-generic-light
+  # tags:
+  #   - mender-qa-worker-generic-light
 
 test:staging-deployment:chrome:
   extends: .template:test:staging-deployment
